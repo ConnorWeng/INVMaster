@@ -1,1 +1,2 @@
-phinx.yml
+/phinx.yml
+composer.phar
