@@ -11,7 +11,10 @@ vendor/bin/phinx init .
 ```
 vendor/bin/phinx create CreateUser
 ```
-> #### 4. 执行迁移：
+
+> #### 4. 编写对应的脚本，实现创建或更新数据库表等代码（脚本默认所在的目录为 db/migrations ）
+
+> #### 5. 执行迁移：
 
 ```
 vendor/bin/phinx migrate -e development
