@@ -1,3 +1,14 @@
 /phinx.yml
 composer.phar
 /vendor
+
+.idea
+*.log
+thinkphp
+/apps/extra
+
+.tags
+.tags_sorted_by_file
+
+/public/logs
+/logs

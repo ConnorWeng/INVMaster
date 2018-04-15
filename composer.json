@@ -1,5 +1,29 @@
 {
+    "name": "INVMaster",
+    "description": "INVMaster is a master.",
+    "type": "project",
+    "keywords": [],
+    "homepage": "",
     "require": {
+        "php": ">=5.4.0",
+        "topthink/framework": "5.0.*",
         "robmorgan/phinx": "^0.9.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "app\\": "apps"
+        }
+    },
+    "extra": {
+        "think-path": "thinkphp"
+    },
+    "config": {
+        "preferred-install": "dist"
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://packagist.phpcomposer.com"
+        }
     }
 }
