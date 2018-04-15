@@ -1,20 +1,25 @@
 ## 一、Phinx的操作流程
 > #### 1. 通过git下载代码
 
-> #### 2. 创建数据库配置文件phinx.yml， 在项目目录打开命令窗口，输入命令：
+> #### 2. 下载phinx (通过composer下载)
+```
+composer install  或 composer update
+```
+
+> #### 3. 创建数据库配置文件phinx.yml， 在项目目录打开命令窗口，输入命令：
 ```
 vendor/bin/phinx init .
 ```
           
-> #### 3. 创建迁移脚本：
+> #### 4. 创建迁移脚本：
 
 ```
 vendor/bin/phinx create CreateUser
 ```
 
-> #### 4. 编写对应的脚本，实现创建或更新数据库表等代码（脚本默认所在的目录为 db/migrations ）
+> #### 5. 编写对应的脚本，实现创建或更新数据库表等代码（脚本默认所在的目录为 db/migrations ）
 
-> #### 5. 执行迁移：
+> #### 6. 执行迁移：
 
 ```
 vendor/bin/phinx migrate -e development
