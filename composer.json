@@ -3,7 +3,6 @@
     "description": "INVMaster is a master.",
     "type": "project",
     "keywords": [],
-    "homepage": "",
     "require": {
         "php": ">=5.4.0",
         "topthink/framework": "5.0.*",
