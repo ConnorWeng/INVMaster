@@ -8,6 +8,8 @@
 **数据库迁移文件管理目录为db/migrations**
 - 数据库迁移相关说明请参考 **PHINX_README.md**
 
+`Ps : 配置文件相关目录 apps/extra ，已被移出了git，请到 tapd.cn 上下载`
+ 
 
 ------------
 
