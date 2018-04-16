@@ -49,7 +49,7 @@ class InnerService extends ApiService
      */
     private function checkRequestMethod()
     {
-        if(!config('api.validate')){   // 跳过验证
+        if(!config('api.validate')['method']){   // 跳过验证
             return true;
         }
 
@@ -71,7 +71,7 @@ class InnerService extends ApiService
      */
     public function validParams()
     {
-        if(!config('api.validate')){   // 跳过验证
+        if(!config('api.validate')['param']){   // 跳过验证
             return true;
         }
 
@@ -164,7 +164,7 @@ class InnerService extends ApiService
      */
     public function validToken()
     {
-        if(!config('api.validate')){   // 跳过验证
+        if(!config('api.validate')['token']){   // 跳过验证
             return true;
         }
 
@@ -404,7 +404,7 @@ class InnerService extends ApiService
             return $this->apiError($this->errCode, $this->error);
         }
 
-        if(!config('api.validate')){   // 跳过验证,则将入参都输出
+        if(!config('api.validate')['param']){   // 跳过验证,则将入参都输出
             print_r($this->params);
         }
 

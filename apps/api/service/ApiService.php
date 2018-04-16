@@ -103,7 +103,7 @@ class ApiService
      */
     public function validSignature($metaData, $signature)
     {
-        if(!config('api.validate')){   // 跳过验证
+        if(!config('api.validate')['sign']){   // 跳过验证
             return true;
         }
 
@@ -130,7 +130,7 @@ class ApiService
      */
     public function validTimestamp($timestamp)
     {
-        if(!config('api.validate')){   // 跳过验证
+        if(!config('api.validate')['timestamp']){   // 跳过验证
             return true;
         }
         $this->log('server time', time(),'api_log');
