@@ -1,5 +1,5 @@
 <?php
-namespace {%namespace%};
+namespace apps\api\service\v\auth;
 
 /**
  * 资源操作服务
@@ -9,9 +9,12 @@ namespace {%namespace%};
  */
 
 use apps\api\service\v\InnerService;
-use {%model%};
+use apps\common\model\WxSessionInfo;
+use apps\common\qcloud\auth\AuthAPI;
+use apps\common\qcloud\Constants;
 
-class {%className%} extends InnerService
+
+class SessionService extends InnerService
 {
 
     /**
@@ -53,7 +56,7 @@ class {%className%} extends InnerService
     public static function instance($params = [])
     {
         if (self::$instance == null) {
-            self::$instance         = new {%className%}();
+            self::$instance         = new SessionService();
             self::$instance->params = $params;
             self::$instance->bCodes = require_once __DIR__."/ErrorCode.php";
             self::$instance->debug  = true;    // 开启调试模式，包括日志的输出
@@ -70,6 +73,9 @@ class {%className%} extends InnerService
         //业务日志记录开始
         $this->log("--------------------- begin","begin -----------------");
         
+        //zjh 2018-04-28 不校验token
+        setValidate('token',false);
+
         //记录接口调用信息
         $this->logStat( $this->params );
 
@@ -103,7 +109,22 @@ class {%className%} extends InnerService
      */ 
     public function get()
     {
-        
+        $code = $this->params['code'];
+        $encryptData = $this->params['encryptedData'];
+        $iv = $this->params['iv'];
+        $withUserinfo = $this->params['withUserinfo'];
+
+        $result = AuthAPI::login($code, $encryptData, $iv, $withUserinfo);
+
+        if ($result['loginState'] === Constants::S_AUTH) {
+
+            $this->success($result['userinfo'] );
+
+        } else {
+          
+            $this->bError(1000);
+        }
+
     }
 
 
@@ -132,7 +153,7 @@ class {%className%} extends InnerService
     {
         $v = $this->params['apiVersion'];
         //zjh 此处可自行调整为合理的uri    
-        return base_uri() . 'api/' . $v . '/{%service%}/{%resources%}/' . $row['{%id%}'];
+        return base_uri() . 'api/' . $v . '/auth/session/' . $row['open_id'];
     }
 
 

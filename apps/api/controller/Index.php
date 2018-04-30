@@ -25,6 +25,7 @@ class Index
         foreach ($config as $key => $value) {
             config($key,$value);
         }
+
     }
 
     public function index($version , $service , $resources , $id = null)
@@ -36,6 +37,11 @@ class Index
           'device'          => request()->header( 'device' ) ,
           'deviceOsVersion' => request()->header( 'device-os-version' ) ,
           'appVersion'      => request()->header( 'app-version' ) ,
+          'token'           => request()->header( 'x-wx-skey' ) ,
+          'code'            => request()->header( 'x-wx-code' ) ,
+          'encryptedData'   => request()->header( 'x-wx-encrypted-data' ) ,
+          'iv'              => request()->header( 'x-wx-iv' ) ,
+          'withUserinfo'    => request()->header( 'x-wx-with-userinfo' ) , 
           'apiVersion'      => $version ,
         ];
 
@@ -60,15 +66,16 @@ class Index
 
         //取时间戳
         $params['timestamp'] = $header['timestamp'];
+        trimArray($params);  // zjh 清除参数两边空格
+
+        //检查签名
+        if ( ! $api->validSignature( $params , $header['signature'] ) ) {
+          exit( json( $api->apiError( 406 ) )->send() );
+        }
 
         //填入指定资源 zjh
         if(isset($id)){
             $params[$resources] = $id;
-        }
-        
-        //检查签名
-        if ( ! $api->validSignature( $params , $header['signature'] ) ) {
-          exit( json( $api->apiError( 406 ) )->send() );
         }
 
         //合并参数
@@ -151,7 +158,17 @@ class Index
         //初始化响应类
         $instance = $class::instance( $params );
         
-        return $instance->response();
+        $response = $instance->response();
+        
+        $result = $instance->getResult();
+
+         //zjh 内部容器已存放了返回数据，可直接获取返回数据
+         //（可省去return） 有时候 success() 和 bError() 容易忘记加上return，导致无数据返回
+        if( $result !== null){  
+            return $result;
+        }
+
+        return $response;
     }
   
 }

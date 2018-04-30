@@ -14,6 +14,7 @@ class ApiService
     public $debug   = false;
     public $error   = '';
     public $errCode = 500;
+    protected $result = null;
 
     //出错代码表(参考或调整http状态码)
     public $code = [
@@ -27,6 +28,7 @@ class ApiService
         405 => 'no allow request method',
         406 => 'error signature',
         450 => 'error timestamp',
+        451 => 'token expired',
         499 => 'unknown error',
 
         //服务端问题
@@ -46,6 +48,33 @@ class ApiService
         }
 
         return self::$instance;
+    }
+
+    /**
+     * 保存返回数据
+     * @param  mixed  $data  返回数据
+     */
+    public function setResult($data)
+    {
+        $this->result = $data;
+    }
+
+    /**
+     * 获取返回数据
+     * @return  [type]  [description]
+     */
+    public function getResult()
+    {
+        return $this->result;
+    }
+
+    /**
+     * 清空返回数据
+     * @return  [type]  [description]
+     */
+    public function clearResult()
+    {
+        $this->result = null;
     }
 
     /**
@@ -77,15 +106,23 @@ class ApiService
         ksort($inputArr);
 
         $new_arr = [];
+        $new_str = '';
+        $tmp = '';
         foreach ($inputArr as $key => $val) {
-            $val = htmlspecialchars_decode($val);
+            // $val = htmlspecialchars_decode($val);
             if (is_array($val)) {
-                $val = json_encode($val, JSON_UNESCAPED_UNICODE);
+                //JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES = 320
+                //不转义反斜杠，中文不转unicode
+                $val = json_encode($val, 320);
             }
             $new_arr[] = "$key=$val";
+            $tmp = "$key=$val";
+            $new_str .= $tmp.'&';
         }
 
-        $signature = http_build_query($inputArr) . '&secret=' . config('api.apisecret');
+        $signature = $new_str . 'secret=' . config('api.apisecret');  //zjh
+
+        // $signature = http_build_query($inputArr) . '&secret=' . config('api.apisecret');
         //逗号转义回来
         // $signature = str_replace('%2C',',',$signature);
         $this->log('签名:', $signature,'api_log');
@@ -166,6 +203,9 @@ class ApiService
             $array     = explode('\\', get_class($this));  // 获取当前类名
             $resources = array_pop($array);
 
+            $service = array_pop($array);
+            $service = strtolower($service).'_';
+
             $dirFile = preg_replace("/([A-Z])/", "_\\1", $resources);
             $dirFile = strtolower($dirFile);
             $dirFile = ltrim($dirFile,'_');
@@ -173,6 +213,8 @@ class ApiService
             if(strrpos($dirFile, '_service') === strlen($dirFile) - 8){
                 $dirFile = substr($dirFile,0,strrpos($dirFile, '_service'));
             }
+
+            $dirFile = $service.$dirFile;
 
         }else{
             $dirFile = strtolower($filename);

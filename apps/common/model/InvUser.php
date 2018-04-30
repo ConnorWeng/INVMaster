@@ -25,5 +25,57 @@ class InvUser extends Model {
     	
     }
 
+    public static function wxStoreUserInfo ($userinfo,$withUserinfo) {
+
+        $open_id = $userinfo['openId'];
+
+        $res = self::where('open_id', $open_id)->find();
+
+        if($withUserinfo === 'no'){
+        	if(!$res){   // 不存在时，只创建open_id信息
+        		self::create([
+	            	'open_id'  			=> $open_id,
+				]);
+        	}
+        	return;
+        }
+
+        $wx_nick_name = $userinfo['nickName'];
+        $wx_avatar_url = $userinfo['avatarUrl'];
+
+        $gender = $userinfo['gender'];
+        $city = $userinfo['city'];
+        $province = $userinfo['province'];
+        $country = $userinfo['country'];
+        
+        
+
+        if (!$res) {
+
+            self::create([
+            	'open_id'  			=> $open_id,
+			    'wx_nick_name'  	=> $wx_nick_name,
+			    'wx_avatar_url'  	=> $wx_avatar_url,
+			    'gender'  			=> $gender,
+			    'city'  			=> $city,
+			    'province'  		=> $province,
+			    'country' 	 		=> $country,
+			]);
+
+        } else {
+
+            self::update([
+			    'wx_nick_name'  	=> $wx_nick_name,
+			    'wx_avatar_url'  	=> $wx_avatar_url,
+			    'gender'  			=> $gender,
+			    'city'  			=> $city,
+			    'province'  		=> $province,
+			    'country' 	 		=> $country,
+
+			], ['open_id' => $open_id]);
+
+        }
+    }
+
 
 }

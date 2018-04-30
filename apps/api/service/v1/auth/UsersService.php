@@ -1,5 +1,5 @@
 <?php
-namespace {%namespace%};
+namespace apps\api\service\v\auth;
 
 /**
  * 资源操作服务
@@ -9,9 +9,9 @@ namespace {%namespace%};
  */
 
 use apps\api\service\v\InnerService;
-use {%model%};
+use apps\common\model\WxSessionInfo;
 
-class {%className%} extends InnerService
+class UsersService extends InnerService
 {
 
     /**
@@ -53,7 +53,7 @@ class {%className%} extends InnerService
     public static function instance($params = [])
     {
         if (self::$instance == null) {
-            self::$instance         = new {%className%}();
+            self::$instance         = new UsersService();
             self::$instance->params = $params;
             self::$instance->bCodes = require_once __DIR__."/ErrorCode.php";
             self::$instance->debug  = true;    // 开启调试模式，包括日志的输出
@@ -103,7 +103,18 @@ class {%className%} extends InnerService
      */ 
     public function get()
     {
-        
+        $token = $this->params['token'];
+
+        $result = WxSessionInfo::findUserBySKey($token);
+
+        if ($result) {
+            $data = json_decode($result['user_info'], true);
+            $this->success($data);
+
+        } else {
+          
+            $this->bError(1000);
+        }
     }
 
 
@@ -132,7 +143,7 @@ class {%className%} extends InnerService
     {
         $v = $this->params['apiVersion'];
         //zjh 此处可自行调整为合理的uri    
-        return base_uri() . 'api/' . $v . '/{%service%}/{%resources%}/' . $row['{%id%}'];
+        return base_uri() . 'api/' . $v . '/auth/users/' . $row['open_id'];
     }
 
 
