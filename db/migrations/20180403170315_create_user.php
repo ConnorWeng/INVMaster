@@ -37,16 +37,16 @@ class CreateUser extends AbstractMigration
     // zjh 创建用户表
     public function up()
     {
-        $this->table('inv_user', array('id'=>'user_id','collation' => 'utf8mb4_unicode_ci','comment'=>'用户表'))
-        
+        $this->table('inv_user', array('id'=>'user_id','comment'=>'用户表'))
+
             ->addColumn('open_id', 'integer', array('limit' => 10,'default'=>0,'signed'=>false,'comment'=>'微信用户id'))
-            ->addColumn('nick_name', 'string', array('limit' => 60,'default'=>'','collation'=>'utf8mb4_unicode_ci','comment'=>'昵称'))
-            ->addColumn('avatar_url', 'string', array('default'=>'','collation'=>'utf8mb4_unicode_ci','comment'=>'用户头像'))
-            ->addColumn('gender', 'integer', array('limit' => MysqlAdapter::INT_TINY,'default'=>0,'signed'=>false,'comment'=>'性别（0为未知，1为男，2为女）')) 
-            ->addColumn('phone', 'string', array('limit' => 60,'default'=>'','collation'=>'utf8mb4_unicode_ci','comment'=>'电话'))
-            ->addColumn('city', 'string', array('default'=>'','collation'=>'utf8mb4_unicode_ci','comment'=>'所在城市'))
-            ->addColumn('province', 'string', array('default'=>'','collation'=>'utf8mb4_unicode_ci','comment'=>'省'))
-            ->addColumn('country', 'string', array('default'=>'','collation'=>'utf8mb4_unicode_ci','comment'=>'国家'))
+            ->addColumn('nick_name', 'string', array('limit' => 60,'default'=>'','comment'=>'昵称'))
+            ->addColumn('avatar_url', 'string', array('default'=>'','comment'=>'用户头像'))
+            ->addColumn('gender', 'integer', array('limit' => MysqlAdapter::INT_TINY,'default'=>0,'signed'=>false,'comment'=>'性别（0为未知，1为男，2为女）'))
+            ->addColumn('phone', 'string', array('limit' => 60,'default'=>'','comment'=>'电话'))
+            ->addColumn('city', 'string', array('default'=>'','comment'=>'所在城市'))
+            ->addColumn('province', 'string', array('default'=>'','comment'=>'省'))
+            ->addColumn('country', 'string', array('default'=>'','comment'=>'国家'))
 
             ->save();
     }

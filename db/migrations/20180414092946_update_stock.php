@@ -33,7 +33,7 @@ class UpdateStock extends AbstractMigration
 
             ->removeColumn('color')
             ->removeColumn('size')
-            ->addColumn('sku_content', 'text', array('default'=>'','collation'=>'utf8mb4_unicode_ci','comment'=>'商品的sku相关信息','after' => 'product_code'))
+            ->addColumn('sku_content', 'text', array('comment'=>'商品的sku相关信息','after' => 'product_code'))
 
             ->update();
     }

@@ -35,10 +35,10 @@ class CreateUserStoreRelate extends AbstractMigration
     // zjh 创建用户档口关联表
     public function up()
     {
-        $this->table('inv_user_store_relate', array('collation' => 'utf8mb4_unicode_ci','comment'=>'用户档口关联表'))
-        
+        $this->table('inv_user_store_relate', array('comment'=>'用户档口关联表'))
+
             ->addColumn('user_id', 'integer', array('limit' => 10,'default'=>0,'signed'=>false,'comment'=>'用户id'))
-            ->addColumn('store_id', 'integer', array('limit' => 10,'default'=>0,'signed'=>false,'comment'=>'店铺id')) 
+            ->addColumn('store_id', 'integer', array('limit' => 10,'default'=>0,'signed'=>false,'comment'=>'店铺id'))
 
             ->save();
     }

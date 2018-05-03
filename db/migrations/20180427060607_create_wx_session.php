@@ -29,15 +29,15 @@ class CreateWxSession extends AbstractMigration
     // zjh 创建微信会话记录表
     public function up()
     {
-        $this->table('wx_session_info', array('collation' => 'utf8mb4_unicode_ci','comment'=>'微信会话记录表','id'=>false,'primary_key'=>array('open_id')))
-        
-            ->addColumn('open_id', 'string', array('limit' => 100,'default'=>'','collation'=>'utf8mb4_unicode_ci','comment'=>'微信用户id'))
-            ->addColumn('uuid', 'string', array('limit' => 100,'default'=>'','collation'=>'utf8mb4_unicode_ci','comment'=>'uuid'))
-            ->addColumn('skey', 'string', array('limit' => 100,'default'=>'','collation'=>'utf8mb4_unicode_ci','comment'=>'会话id'))
+        $this->table('wx_session_info', array('comment'=>'微信会话记录表','id'=>false,'primary_key'=>array('open_id')))
+
+            ->addColumn('open_id', 'string', array('limit' => 100,'default'=>'','comment'=>'微信用户id'))
+            ->addColumn('uuid', 'string', array('limit' => 100,'default'=>'','comment'=>'uuid'))
+            ->addColumn('skey', 'string', array('limit' => 100,'default'=>'','comment'=>'会话id'))
             ->addColumn('create_time', 'timestamp', array('default'=>CURRENT_TIMESTAMP,'comment'=>'创建时间'))
             ->addColumn('last_visit_time', 'timestamp', array('default'=>'0000-00-00 00:00:00','comment'=>'最近更新时间'))
-            ->addColumn('session_key', 'string', array('limit' => 100,'default'=>'','collation'=>'utf8mb4_unicode_ci','comment'=>'会话密钥，用于解密微信的敏感数据'))
-            ->addColumn('user_info', 'string', array('limit' => 2048,'default'=>'','collation'=>'utf8mb4_unicode_ci','comment'=>'用户数据'))
+            ->addColumn('session_key', 'string', array('limit' => 100,'default'=>'','comment'=>'会话密钥，用于解密微信的敏感数据'))
+            ->addColumn('user_info', 'string', array('limit' => 2048,'default'=>'','comment'=>'用户数据'))
 
             ->save();
     }

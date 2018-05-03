@@ -30,8 +30,8 @@ class FixUserOpenId extends AbstractMigration
     public function up()
     {
         $this->table('inv_user')
-        
-            ->changeColumn('open_id', 'string', array('limit' => 100,'default'=>'','collation'=>'utf8mb4_unicode_ci','comment'=>'微信用户id'))
+
+            ->changeColumn('open_id', 'string', array('limit' => 100,'default'=>'','comment'=>'微信用户id'))
 
             ->update();
     }

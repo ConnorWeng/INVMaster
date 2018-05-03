@@ -32,8 +32,8 @@ class UpdateStockLog extends AbstractMigration
         $this->table('inv_stock_log')
 
 
-            ->addColumn('color', 'string', array('limit' => 60,'default'=>'','collation'=>'utf8mb4_unicode_ci','comment'=>'颜色','after' => 'product_code'))
-            ->addColumn('size', 'string', array('limit' => 60,'default'=>'','collation'=>'utf8mb4_unicode_ci','comment'=>'尺码','after' => 'color'))
+            ->addColumn('color', 'string', array('limit' => 60,'default'=>'','comment'=>'颜色','after' => 'product_code'))
+            ->addColumn('size', 'string', array('limit' => 60,'default'=>'','comment'=>'尺码','after' => 'color'))
 
             ->save();
     }
