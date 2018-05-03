@@ -1,0 +1,19 @@
+	'{%code%}'=>[
+		//GET
+		1000 => 'no resources',
+
+		//POST
+		2000 => 'test',
+
+		//PUT
+		3000 => 'test',
+
+		//PATCH
+		4000 => 'test',
+
+		//DELETE
+		5000 => 'test',
+
+	],
+
+/*{%new_code%}*/

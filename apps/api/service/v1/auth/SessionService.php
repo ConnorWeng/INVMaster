@@ -1,17 +1,20 @@
 <?php
-namespace apps\api\service\v\stock;
+namespace apps\api\service\v\auth;
 
 /**
- * 库存信息
+ * 资源操作服务
  *
  * @author  zjh
  * @version 1.0 2018-04-09
  */
 
 use apps\api\service\v\InnerService;
-use apps\common\model\InvStock;
+use apps\common\model\WxSessionInfo;
+use apps\common\qcloud\auth\AuthAPI;
+use apps\common\qcloud\Constants;
 
-class StocksService extends InnerService
+
+class SessionService extends InnerService
 {
 
     /**
@@ -19,7 +22,7 @@ class StocksService extends InnerService
      * 可以为：get、post、put、delete、patch
      */
     public $allowRequestMethod = [
-        'get' => 'GET - 取得库存信息集合',
+        'get' => 'GET - 获取资源',
     ];
 
     /**
@@ -42,19 +45,10 @@ class StocksService extends InnerService
      * 既适用于单个数组，也适用于数组列表中的每一个数组元素
      */
     public $defaultResponse = [
-        'get' => [
+        // 'get' => [
 
-            'stock_id' =>'库存id',
-            'product_id' => '商品id',
-            'store_id' => '店铺id',
-            'thumbnail' => '商品缩略图',
-            'product_code' => '货号',
-            'sku_content' => '商品的sku相关信息',
-            'stock_amount' => '库存数量',
-            'add_time' => ['添加时间',"formatTime"],
-            'last_update' => ['最近更新时间',"formatTime"],
-            "uri"        => ["当前uri", "formatUri"],
-        ],
+        //     "uri"        => ["当前uri", "formatUri"],
+        // ],
     ];
 
     private static $instance;
@@ -62,7 +56,7 @@ class StocksService extends InnerService
     public static function instance($params = [])
     {
         if (self::$instance == null) {
-            self::$instance         = new StocksService();
+            self::$instance         = new SessionService();
             self::$instance->params = $params;
             self::$instance->bCodes = require_once __DIR__."/ErrorCode.php";
             self::$instance->debug  = true;    // 开启调试模式，包括日志的输出
@@ -79,6 +73,9 @@ class StocksService extends InnerService
         //业务日志记录开始
         $this->log("--------------------- begin","begin -----------------");
         
+        //zjh 2018-04-28 不校验token
+        setValidate('token',false);
+
         //记录接口调用信息
         $this->logStat( $this->params );
 
@@ -112,17 +109,22 @@ class StocksService extends InnerService
      */ 
     public function get()
     {
-        $limit = 10;
-        $list = InvStock::all(function ($query) use($limit){
-            $query->order('stock_id desc')
-                  ->limit($limit);
-        });
-        if($list) {
-            return $this->success($list);
-        }else{
-            return $this->bError(1000);
+        $code = $this->params['code'];
+        $encryptData = $this->params['encryptedData'];
+        $iv = $this->params['iv'];
+        $withUserinfo = $this->params['withUserinfo'];
+
+        $result = AuthAPI::login($code, $encryptData, $iv, $withUserinfo);
+
+        if ($result['loginState'] === Constants::S_AUTH) {
+
+            $this->success($result['userinfo'] );
+
+        } else {
+          
+            $this->bError(1000);
         }
-        
+
     }
 
 
@@ -150,7 +152,9 @@ class StocksService extends InnerService
     public function formatUri($value, $row = [])
     {
         $v = $this->params['apiVersion'];
-        return base_uri() . 'api/' . $v . '/stock/stocks/' . $row['stock_id'];
+        //zjh 此处可自行调整为合理的uri    
+        return base_uri() . 'api/' . $v . '/auth/session/' . $row['open_id'];
     }
+
 
 }

@@ -42,10 +42,10 @@ class {%className%} extends InnerService
      * 既适用于单个数组，也适用于数组列表中的每一个数组元素
      */
     public $defaultResponse = [
-        'get' => [
+        // 'get' => [
 
-            "uri"        => ["当前uri", "formatUri"],
-        ],
+        //     "uri"        => ["当前uri", "formatUri"],
+        // ],
     ];
 
     private static $instance;

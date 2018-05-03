@@ -21,9 +21,27 @@
 
 return [
 
-	'{%code%}'=>[
+	'auth.session'=>[
 		//GET
-		1000 => 'no resources',
+		1000 => '会话连接失败',
+
+		//POST
+		2000 => 'test',
+
+		//PUT
+		3000 => 'test',
+
+		//PATCH
+		4000 => 'test',
+
+		//DELETE
+		5000 => 'test',
+
+	],
+
+	'auth.users'=>[
+		//GET
+		1000 => '找不到当前会话的用户信息',
 
 		//POST
 		2000 => 'test',

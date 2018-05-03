@@ -155,3 +155,64 @@ function api_rmdir($dir)
 
     return $ret_val;
 }
+
+
+/**
+ * 动态更改校验选项配置 zjh 2018-04-28 （使用该函数可动态设置接口需校验的选项）
+ * 校验选项包括：时间戳、签名、参数、token、请求方式
+ * @param  string  $name   校验的选项
+ * @param  bool  $value  是否校验
+ */
+function setValidate($name,$value)
+{
+    $conf = config('api.validate');
+
+    $result = $conf;
+
+    if(array_key_exists($name, $result)){
+        $result[$name] = $value;
+    }
+    
+    config('api.validate',$result);
+
+}
+
+
+/**
+ * 数组按键名升序(递归深入排序)
+ * zjh 2018-04-29
+ * @param   array  &$array  要排序的数组
+ * @return  array           排序后的数组
+ */
+function deepKsort(&$array)
+{
+    if(is_array($array)){
+        ksort($array);
+        foreach($array as $k=>$v){
+            if(is_array($v)){
+                deepKsort($array[$k]);
+            }
+        } 
+    }
+}
+
+/**
+ * 递归清除数组键值字符串两边空格
+ * zjh 2018-04-29
+ * @param   array  &$array  要的数组处理
+ * @return  array           处理后的数组
+ */
+function trimArray(&$array)
+{
+    if(is_array($array)){
+        foreach($array as $k=>$v){
+            if(is_array($v)){
+                trimArray($array[$k]);
+            }else{
+                $array[$k] = trim($array[$k]);
+            }
+        } 
+    }else{
+        $array = trim($array);
+    }
+}

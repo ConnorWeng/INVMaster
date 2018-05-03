@@ -13,6 +13,7 @@ use think\Db;
 use think\Exception;
 use think\exception\HttpException;
 use think\Log;
+use apps\common\model\WxSessionInfo;
 
 define('PARAM_REQUIRED', 'required');
 define('PARAM_DIGIT', 'digit');
@@ -49,7 +50,7 @@ class InnerService extends ApiService
      */
     private function checkRequestMethod()
     {
-        if(!config('api.validate')){   // 跳过验证
+        if(!config('api.validate')['method']){   // 跳过验证
             return true;
         }
 
@@ -71,7 +72,7 @@ class InnerService extends ApiService
      */
     public function validParams()
     {
-        if(!config('api.validate')){   // 跳过验证
+        if(!config('api.validate')['param']){   // 跳过验证
             return true;
         }
 
@@ -164,7 +165,7 @@ class InnerService extends ApiService
      */
     public function validToken()
     {
-        if(!config('api.validate')){   // 跳过验证
+        if(!config('api.validate')['token']){   // 跳过验证
             return true;
         }
 
@@ -179,7 +180,8 @@ class InnerService extends ApiService
         } else {
 
             // 查找用户登录信息表，token是否有对应的登录信息
-            $MemberData = 0; //一会修改 zjh
+            
+            $MemberData = WxSessionInfo::findUserBySKey($this->params['token']); 
 
             if (empty($MemberData)) {
                 //数据未找到
@@ -189,7 +191,18 @@ class InnerService extends ApiService
                 return false;
             }
 
-            $this->userId = $MemberData['user_id'];
+            $wxLoginExpires = config('api.wxLoginExpires');
+            $timeDifference = time() - strtotime($MemberData->last_visit_time);
+            
+            if ($timeDifference > $wxLoginExpires) {
+                //登录态过期
+                $this->error   = '登录态过期';
+                $this->errCode = 451;
+
+                return false;
+            }
+
+            $this->openId = $MemberData['open_id'];  //微信的open_id
 
             return true;
         }
@@ -313,7 +326,11 @@ class InnerService extends ApiService
         // 格式化数据
         $data = $this->formatData($data);
 
-        return api_result($code,trim($msg),$data);     
+        $re = api_result($code,trim($msg),$data);  
+
+        $this->setResult($re);   // 输出前在内部保存一下结果
+
+        return $re;
     }
 
 
@@ -378,7 +395,11 @@ class InnerService extends ApiService
         $bcode = (int) $bcode;
         $issue = $this->bcode($bcode);
 
-        return api_result($code, trim($msg), [], $issue);
+        $re = api_result($code, trim($msg), [], $issue);
+        
+        $this->setResult($re);   // 输出前在内部保存一下结果
+
+        return $re;
     }
 
 
@@ -404,22 +425,29 @@ class InnerService extends ApiService
             return $this->apiError($this->errCode, $this->error);
         }
 
-        if(!config('api.validate')){   // 跳过验证,则将入参都输出
+        if(!config('api.validate')['param']){   // 跳过验证,则将入参都输出
             print_r($this->params);
         }
+
+        $this->clearResult();   //在处理业务前，清空一下可能存在的旧的返回数据
 
         //处理业务
         switch (request()->method()) {
             case 'GET':
-                return empty( $this->get() ) ? $this->apiError(503,'get service unavailable') : $this->get() ;
+                $re = $this->get();
+                return empty($re) ? $this->apiError(503,'get service unavailable') : $re ;
             case 'POST':
-                return empty( $this->post() ) ? $this->apiError(503,'post service unavailable') : $this->post() ;
+                $re = $this->post();
+                return empty($re) ? $this->apiError(503,'post service unavailable') : $re ;
             case 'PUT':
-                return empty( $this->put() ) ? $this->apiError(503,'put service unavailable') : $this->put() ;
+                $re = $this->put();
+                return empty($re) ? $this->apiError(503,'put service unavailable') : $re ;
             case 'DELETE':
-                return empty( $this->delete() ) ? $this->apiError(503,'delete service unavailable') : $this->delete() ;
+                $re = $this->delete();
+                return empty($re) ? $this->apiError(503,'delete service unavailable') : $re ;
             case 'PATCH':
-                return empty( $this->patch() ) ? $this->apiError(503,'patch service unavailable') : $this->patch() ;
+                $re = $this->patch();
+                return empty($re) ? $this->apiError(503,'patch service unavailable') : $re ;
             default:
                 return $this->apiError(405);
         }

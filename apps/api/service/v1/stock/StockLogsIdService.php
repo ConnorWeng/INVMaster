@@ -49,6 +49,8 @@ class StockLogsIdService extends InnerService
             'nick_name' => '用户昵称',
             'stock_id' => '商品库存id',
             'product_code' => '货号',
+            'color' => '颜色',
+            'size' => '尺码',
             'type' => '操作类型：1 入库操作，2 出库操作',
             'number' => '出入库的数量',
             'add_time' => ['记录添加时间（操作时间）','formatTime'],

@@ -510,7 +510,83 @@ if (!function_exists('trimall')) {
 if (!function_exists('sep_region')) {
     function sep_region($str)
     {
-        return str_replace('	', ',', $str);
+        return str_replace('    ', ',', $str);
     }
 
+}
+
+/**
+
+ * 数组 转 对象
+
+ *
+
+ * @param array $arr 数组
+
+ * @return object
+
+ */
+if (!function_exists('array_to_object')) {
+
+    function array_to_object($arr)
+    {
+
+        if (gettype($arr) != 'array') {
+
+            return;
+
+        }
+
+        foreach ($arr as $k => $v) {
+
+            if (gettype($v) == 'array' || getType($v) == 'object') {
+
+                $arr[$k] = (object) array_to_object($v);
+
+            }
+
+        }
+
+        return (object) $arr;
+
+    }
+}
+
+/**
+
+ * 对象 转 数组
+
+ *
+
+ * @param object $obj 对象
+
+ * @return array
+
+ */
+if (!function_exists('object_to_array')) {
+
+    function object_to_array($obj)
+    {
+
+        $obj = (array) $obj;
+
+        foreach ($obj as $k => $v) {
+
+            if (gettype($v) == 'resource') {
+
+                return;
+
+            }
+
+            if (gettype($v) == 'object' || gettype($v) == 'array') {
+
+                $obj[$k] = (array) object_to_array($v);
+
+            }
+
+        }
+
+        return $obj;
+
+    }
 }
