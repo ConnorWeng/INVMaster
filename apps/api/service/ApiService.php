@@ -220,12 +220,12 @@ class ApiService
             $dirFile = strtolower($filename);
         }
 
-        if(!is_dir(ROOT_PATH.'/public/logs/'.$month.'/'.$dirFile)){
-            api_mkdir(ROOT_PATH.'/public/logs/'.$month.'/'.$dirFile);
+        if(!is_dir(ROOT_PATH.'public/logs/'.$month.'/'.$dirFile)){
+            api_mkdir(ROOT_PATH.'public/logs/'.$month.'/'.$dirFile);
         }
 
         // 完整文件名
-        $fullFilename = ROOT_PATH.'/public/logs/'.$month.'/'.$dirFile.'/'.$dirFile.$date.'.'.$suffix;
+        $fullFilename = ROOT_PATH.'public/logs/'.$month.'/'.$dirFile.'/'.$dirFile.$date.'.'.$suffix;
 
         if (!file_exists($fullFilename)) {
             file_put_contents($fullFilename, '');
@@ -247,17 +247,17 @@ class ApiService
      */
     public function rmlog()
     {
-        $day = date("d");  
+        $day = date("d");
         //为了接口的效率，只在月初的1号去判断一下是否有过期日志并删除
-        if($day != 1){ 
+        if($day != 1){
             return;
         }
 
         $life = (int)config('api.loglife');
         $life = abs($life);
-        $dir = ROOT_PATH.'/public/logs';
+        $dir = ROOT_PATH.'public/logs';
 
-        $arr = scandir($dir);  
+        $arr = scandir($dir);
         $all = count($arr)-3;//所有文件总数除./和../和index.htm
         if($all <= $life){   //简单判断，日志都在生命周期内，则不用再做删减操作
             return;
@@ -268,7 +268,7 @@ class ApiService
         date_modify($date,"-".$life."month");
         // 过期的月份
         $expiredMonth = date_format($date,"Ym");
-        
+
         if (is_dir($dir)) {
             $d = @dir($dir);
             if ($d) {

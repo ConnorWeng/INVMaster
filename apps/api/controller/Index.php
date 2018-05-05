@@ -13,7 +13,7 @@ use apps\api\service\ApiService;
 class Index
 {
     public $api = NULL;
-  
+
     public function __construct() {
         $this->api        = ApiService::instance();
         $this->api->debug = true;
@@ -41,7 +41,7 @@ class Index
           'code'            => request()->header( 'x-wx-code' ) ,
           'encryptedData'   => request()->header( 'x-wx-encrypted-data' ) ,
           'iv'              => request()->header( 'x-wx-iv' ) ,
-          'withUserinfo'    => request()->header( 'x-wx-with-userinfo' ) , 
+          'withUserinfo'    => request()->header( 'x-wx-with-userinfo' ) ,
           'apiVersion'      => $version ,
         ];
 
@@ -49,7 +49,7 @@ class Index
         $api = $this->api;
 
         // 记录日志：头部信息
-        $api->log('header',request()->header(),'api_log');   
+        $api->log('header',request()->header(),'api_log');
         $api->log( 'headerData' ,$header ,'api_log' );
         $api->log( 'request ' , request()->method() ,'api_log');
 
@@ -90,7 +90,7 @@ class Index
         }
 
         $result = $this->response( $version , $service , $resources , $params ,$id);
-        
+
         //删除过期日志
         $api->rmlog();
 
@@ -111,12 +111,12 @@ class Index
     private function response( $version , $service , $resources , $params ,$id) {
 
         //资源名称，下划线转驼峰
-        $array = explode('_', $resources);  
-        $result = '';  
-        foreach($array as $value){  
-            $result.= ucfirst($value);  
-        } 
-        $resources  = $result; 
+        $array = explode('_', $resources);
+        $result = '';
+        foreach($array as $value){
+            $result.= ucfirst($value);
+        }
+        $resources  = $result;
 
 
         $version = strtolower( $version );
@@ -137,7 +137,7 @@ class Index
                     $className = str_replace("\\v\\","\\".$version."\\",$className);
                 }
 
-                include ROOT_PATH."/{$className}.php";
+                include ROOT_PATH."{$className}.php";
 
             }, true, false);
 
@@ -157,18 +157,18 @@ class Index
 
         //初始化响应类
         $instance = $class::instance( $params );
-        
+
         $response = $instance->response();
-        
+
         $result = $instance->getResult();
 
          //zjh 内部容器已存放了返回数据，可直接获取返回数据
          //（可省去return） 有时候 success() 和 bError() 容易忘记加上return，导致无数据返回
-        if( $result !== null){  
+        if( $result !== null){
             return $result;
         }
 
         return $response;
     }
-  
+
 }
