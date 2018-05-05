@@ -109,7 +109,6 @@ class Index
    * @return array
    */
     private function response( $version , $service , $resources , $params ,$id) {
-
         //资源名称，下划线转驼峰
         $array = explode('_', $resources);
         $result = '';
@@ -117,7 +116,6 @@ class Index
             $result.= ucfirst($value);
         }
         $resources  = $result;
-
 
         $version = strtolower( $version );
 
@@ -136,6 +134,7 @@ class Index
                 if(isset($version)){
                     $className = str_replace("\\v\\","\\".$version."\\",$className);
                 }
+                $className = str_replace('\\', '/', $className);
 
                 include ROOT_PATH."{$className}.php";
 
