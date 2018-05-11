@@ -12,7 +12,7 @@
 use think\Route;
 
 //接口
-Route::rule( 'api/:version/:service/:resources/[:id]' , 'api/index/index' );
+Route::rule( 'api/:version/:service/[:resources]/[:id]' , 'api/index/index' );
 
 return [
     '__pattern__' => [

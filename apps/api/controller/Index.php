@@ -28,7 +28,7 @@ class Index
 
     }
 
-    public function index($version , $service , $resources , $id = null)
+    public function index($version , $service , $resources = null , $id = null)
     {
         //取 http 头
         $header = [
@@ -110,18 +110,24 @@ class Index
    */
     private function response( $version , $service , $resources , $params ,$id) {
         //资源名称，下划线转驼峰
-        $array = explode('_', $resources);
-        $result = '';
-        foreach($array as $value){
-            $result.= ucfirst($value);
+        if ($resources) {
+            $array = explode('_', $resources);
+            $result = '';
+            foreach($array as $value){
+                $result.= ucfirst($value);
+            }
+            $resources  = $result;
         }
-        $resources  = $result;
 
         $version = strtolower( $version );
 
         // zjh 查询时指定了资源
         if(isset($id)){
             $resources  .= 'Id';
+        }
+
+        if (!$resources) {
+            $resources = ucfirst($service);
         }
 
         $subVer = substr($version, 1);
