@@ -31,15 +31,21 @@ class InnerService extends ApiService
 
     public $userId = '';
 
+    private $wxSessionInfoModel;
+
     private static $instance;
 
     public static function instance()
     {
         if (self::$instance == null) {
-            self::$instance = new InnerService();
+            self::$instance = new self();
         }
 
         return self::$instance;
+    }
+
+    public function __construct() {
+        $this->wxSessionInfoModel = new WxSessionInfo;
     }
 
     /**
@@ -58,7 +64,7 @@ class InnerService extends ApiService
         $requestMethod = strtolower(request()->method());
 
         $this->log("method",$requestMethod);
-        
+
         if (empty($this->allowRequestMethod)) {
             return false;
         }
@@ -181,8 +187,7 @@ class InnerService extends ApiService
         } else {
 
             // 查找用户登录信息表，token是否有对应的登录信息
-            
-            $MemberData = WxSessionInfo::findUserBySKey($this->params['token']); 
+            $MemberData = $this->wxSessionInfoModel->findUserBySKey($this->params['token']);
 
             if (empty($MemberData)) {
                 //数据未找到
@@ -204,6 +209,7 @@ class InnerService extends ApiService
             }
 
             $this->openId = $MemberData['open_id'];  //微信的open_id
+            $this->userData = $MemberData->user;
 
             return true;
         }
@@ -302,7 +308,7 @@ class InnerService extends ApiService
         }else{
             return date("Y-m-d H:i:s",0);
         }
-       
+
     }
 
 
@@ -314,7 +320,7 @@ class InnerService extends ApiService
      */
     public function success($data=[],$msg='')
     {
-    
+
         reset($this->code);   // 指针指向错误码表的第一个值
 
         $code = key($this->code);
@@ -327,7 +333,7 @@ class InnerService extends ApiService
         // 格式化数据
         $data = $this->formatData($data);
 
-        $re = api_result($code,trim($msg),$data);  
+        $re = api_result($code,trim($msg),$data);
 
         $this->setResult($re);   // 输出前在内部保存一下结果
 
@@ -397,7 +403,7 @@ class InnerService extends ApiService
         $issue = $this->bcode($bcode);
 
         $re = api_result($code, trim($msg), [], $issue);
-        
+
         $this->setResult($re);   // 输出前在内部保存一下结果
 
         return $re;
@@ -523,6 +529,6 @@ class InnerService extends ApiService
             db('sys_api_log')->insert($data);
         }
     }
-    
+
 
 }

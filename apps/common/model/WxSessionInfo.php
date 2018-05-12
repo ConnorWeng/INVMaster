@@ -27,18 +27,18 @@ class WxSessionInfo extends Model
 
         if (!$res) {
 
-        	$add = [
-            	'open_id'  			=> $open_id,
-			    'uuid'  			=> $uuid,
-			    'skey'  			=> $skey,
-			    'create_time'  		=> $create_time,
-			    'last_visit_time'  	=> $last_visit_time,
-			    'session_key'  		=> $session_key,
-			];
+            $add = [
+                'open_id'           => $open_id,
+                'uuid'              => $uuid,
+                'skey'              => $skey,
+                'create_time'       => $create_time,
+                'last_visit_time'   => $last_visit_time,
+                'session_key'       => $session_key,
+            ];
 
-			if($withUserinfo === 'yes'){
-				$add['user_info'] = $user_info;
-			}
+            if($withUserinfo === 'yes'){
+                $add['user_info'] = $user_info;
+            }
 
             self::create($add);
 
@@ -46,16 +46,16 @@ class WxSessionInfo extends Model
 
         } else {
 
-        	$update = [
-			    'uuid'  			=> $uuid,
-			    'skey'  			=> $skey,
-			    'last_visit_time'  	=> $last_visit_time,
-			    'session_key'  		=> $session_key,
-			];
+            $update = [
+                'uuid'              => $uuid,
+                'skey'              => $skey,
+                'last_visit_time'   => $last_visit_time,
+                'session_key'       => $session_key,
+            ];
 
-			if($withUserinfo === 'yes'){
-				$update['user_info'] = $user_info;
-			}
+            if($withUserinfo === 'yes'){
+                $update['user_info'] = $user_info;
+            }
 
             self::update($update, ['open_id' => $open_id]);
 
@@ -64,10 +64,11 @@ class WxSessionInfo extends Model
         }
     }
 
-    public static function findUserBySKey ($skey) {
+    public function user() {
+        return $this->hasOne('InvUser', 'open_id');
+    }
 
-    	return self::where('skey', $skey)->find();
+    public function findUserBySKey ($skey) {
+        return $this->hasWhere('user', ['WxSessionInfo.skey' => $skey])->find();
     }
 }
-
-
