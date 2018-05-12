@@ -13,6 +13,7 @@ use think\Db;
 use think\Exception;
 use think\exception\HttpException;
 use think\Log;
+use think\Config;
 use apps\common\model\WxSessionInfo;
 
 define('PARAM_REQUIRED', 'required');
@@ -193,8 +194,8 @@ class InnerService extends ApiService
 
             $wxLoginExpires = config('api.wxLoginExpires');
             $timeDifference = time() - strtotime($MemberData->last_visit_time);
-            
-            if ($timeDifference > $wxLoginExpires) {
+
+            if (!Config::get('app_debug') && $timeDifference > $wxLoginExpires) {
                 //登录态过期
                 $this->error   = '登录态过期';
                 $this->errCode = 451;

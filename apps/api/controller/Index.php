@@ -7,7 +7,7 @@ namespace apps\api\controller;
  * @author  zjh
  * @date 2018-04-02
  */
-
+use think\Config;
 use apps\api\service\ApiService;
 
 class Index
@@ -54,7 +54,7 @@ class Index
         $api->log( 'request ' , request()->method() ,'api_log');
 
         // 检查时间戳
-        if ( ! $api->validTimestamp( $header['timestamp'] ) ) {
+        if (!Config::get('app_debug') && !$api->validTimestamp($header['timestamp'])) {
           exit( json( $api->apiError( 450 ) )->send() );
         }
 
@@ -69,7 +69,7 @@ class Index
         trimArray($params);  // zjh 清除参数两边空格
 
         //检查签名
-        if ( ! $api->validSignature( $params , $header['signature'] ) ) {
+        if (!Config::get('app_debug') && !$api->validSignature($params , $header['signature'])) {
           exit( json( $api->apiError( 406 ) )->send() );
         }
 
