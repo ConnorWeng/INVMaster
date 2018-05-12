@@ -13,16 +13,14 @@ namespace apps\common\model;
 use think\Model;
 
 class InvUser extends Model {
-
-
-	/**
-	 * 获取一个数据
-	 * @param   [type]  $id  [description]
-	 * @return  [type]       [description]
-	 */
+    /**
+     * 获取一个数据
+     * @param   [type]  $id  [description]
+     * @return  [type]       [description]
+     */
     public function user($id)
     {
-    	
+
     }
 
     public static function wxStoreUserInfo ($userinfo,$withUserinfo) {
@@ -32,12 +30,12 @@ class InvUser extends Model {
         $res = self::where('open_id', $open_id)->find();
 
         if($withUserinfo === 'no'){
-        	if(!$res){   // 不存在时，只创建open_id信息
-        		self::create([
-	            	'open_id'  			=> $open_id,
-				]);
-        	}
-        	return;
+            if(!$res){   // 不存在时，只创建open_id信息
+                self::create([
+                    'open_id'           => $open_id,
+                ]);
+            }
+            return;
         }
 
         $wx_nick_name = $userinfo['nickName'];
@@ -47,35 +45,38 @@ class InvUser extends Model {
         $city = $userinfo['city'];
         $province = $userinfo['province'];
         $country = $userinfo['country'];
-        
-        
+
+
 
         if (!$res) {
 
             self::create([
-            	'open_id'  			=> $open_id,
-			    'wx_nick_name'  	=> $wx_nick_name,
-			    'wx_avatar_url'  	=> $wx_avatar_url,
-			    'gender'  			=> $gender,
-			    'city'  			=> $city,
-			    'province'  		=> $province,
-			    'country' 	 		=> $country,
-			]);
+                'open_id'           => $open_id,
+                'wx_nick_name'      => $wx_nick_name,
+                'wx_avatar_url'     => $wx_avatar_url,
+                'gender'            => $gender,
+                'city'              => $city,
+                'province'          => $province,
+                'country'           => $country,
+            ]);
 
         } else {
 
             self::update([
-			    'wx_nick_name'  	=> $wx_nick_name,
-			    'wx_avatar_url'  	=> $wx_avatar_url,
-			    'gender'  			=> $gender,
-			    'city'  			=> $city,
-			    'province'  		=> $province,
-			    'country' 	 		=> $country,
+                'wx_nick_name'      => $wx_nick_name,
+                'wx_avatar_url'     => $wx_avatar_url,
+                'gender'            => $gender,
+                'city'              => $city,
+                'province'          => $province,
+                'country'           => $country,
 
-			], ['open_id' => $open_id]);
+            ], ['open_id' => $open_id]);
 
         }
     }
 
+    public function stores() {
+        return $this->belongsToMany('InvStore', 'InvUserStoreRelate', 'store_id', 'user_id');
+    }
 
 }

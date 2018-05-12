@@ -14,16 +14,9 @@ use think\Model;
 
 class InvStock extends Model {
 
-
-	/**
-	 * 获取一个数据
-	 * @param   [type]  $id  [description]
-	 * @return  [type]       [description]
-	 */
-    public function stock($id)
-    {
-    	
+    public function getStoreProducts($storeId, $limit, $start) {
+        $relateModel = $this->hasManyThrough('InvStock', 'InvUserStoreRelate');
+        return $relateModel->where('store_id', $storeId)->limit($start, $limit)->select();
     }
-
 
 }
