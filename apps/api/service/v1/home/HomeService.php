@@ -118,9 +118,10 @@ class HomeService extends InnerService
             // 暂时先实现单店铺的场景
             $storeProducts = $this->stockModel->getStoreProducts($stores[0]->store_id, $limit, $start);
             $this->success([
-                '_links' => ['next' => '/api/v1/home?limit=20&start='.($start + count($storeProducts))],
+                '_links' => ['next' => count($storeProducts) === $limit ? '/api/v1/home?limit=20&start='.($start + count($storeProducts)) : ''],
                 'store' => $stores[0],
                 'store_products' => $storeProducts,
+                'sync_products' => [],
             ]);
         } else {
             $this->bError(1000);
