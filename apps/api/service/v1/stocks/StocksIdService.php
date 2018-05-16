@@ -1,5 +1,5 @@
 <?php
-namespace apps\api\service\v\stock;
+namespace apps\api\service\v\stocks;
 
 /**
  * 库存信息
@@ -75,10 +75,10 @@ class StocksIdService extends InnerService
      * 接口响应方法
      */
     public function response()
-    { 
+    {
         //业务日志记录开始
         $this->log("--------------------- begin","begin -----------------");
-        
+
         //记录接口调用信息
         $this->logStat( $this->params );
 
@@ -101,15 +101,15 @@ class StocksIdService extends InnerService
 //      上面的属性 $this->allowRequestMethod 用于控制允许的请求方法
 //      上面的属性 $this->defaultParams 用于控制接口入参的类型和必要性
 /*-----------------------------------------------------------------------------------------------------------*/
-//      记录日志：log($key,$value [,$filename]);   $value可以为数组；  
-//      $filename 一般不需要，默认文件名为当前类名(需要做一些处理)  如：UsersIdService (类名) ==> users_id (文件名)  
+//      记录日志：log($key,$value [,$filename]);   $value可以为数组；
+//      $filename 一般不需要，默认文件名为当前类名(需要做一些处理)  如：UsersIdService (类名) ==> users_id (文件名)
 /*-----------------------------------------------------------------------------------------------------------*/
 
 
     /**
      * [get 业务处理入口]
      * @return  Array  处理结果
-     */ 
+     */
     public function get()
     {
         $stockId = $this->params['stocks'];
@@ -122,16 +122,16 @@ class StocksIdService extends InnerService
             }else{
                 return $this->bError(1000);
             }
-            
+
         }
-        
+
     }
 
 
     /**
      * [post 业务处理入口]
      * @return  Array  处理结果
-     */ 
+     */
     public function post()
     {
 
@@ -148,7 +148,7 @@ class StocksIdService extends InnerService
      * @param   [type]  $value  [description]
      * @param   array   $row    [description]
      * @return  [type]          [description]
-     */     
+     */
     public function formatUri($value, $row = [])
     {
         $v = $this->params['apiVersion'];

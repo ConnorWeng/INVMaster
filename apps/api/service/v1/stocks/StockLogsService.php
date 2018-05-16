@@ -1,5 +1,5 @@
 <?php
-namespace apps\api\service\v\stock;
+namespace apps\api\service\v\stocks;
 
 /**
  * 库存操作记录信息
@@ -11,7 +11,7 @@ namespace apps\api\service\v\stock;
 use apps\api\service\v\InnerService;
 use apps\common\model\InvStockLog;
 
-class StockLogsIdService extends InnerService
+class StockLogsService extends InnerService
 {
 
     /**
@@ -19,7 +19,7 @@ class StockLogsIdService extends InnerService
      * 可以为：get、post、put、delete、patch
      */
     public $allowRequestMethod = [
-        'get' => 'GET - 取得库存操作记录信息',
+        'get' => 'GET - 取得库存操作记录信息集合',
     ];
 
     /**
@@ -30,7 +30,7 @@ class StockLogsIdService extends InnerService
      */
     public $defaultParams = [
         'get' => [
-            "stock_logs" => ['指定的库存操作记录', 0, PARAM_REQUIRED],
+
         ],
     ];
 
@@ -66,7 +66,7 @@ class StockLogsIdService extends InnerService
     public static function instance($params = [])
     {
         if (self::$instance == null) {
-            self::$instance         = new StockLogsIdService();
+            self::$instance         = new StockLogsService();
             self::$instance->params = $params;
             self::$instance->bCodes = require_once __DIR__."/ErrorCode.php";
             self::$instance->debug  = true;    // 开启调试模式，包括日志的输出
@@ -79,10 +79,10 @@ class StockLogsIdService extends InnerService
      * 接口响应方法
      */
     public function response()
-    { 
+    {
         //业务日志记录开始
         $this->log("--------------------- begin","begin --------------------");
-        
+
         //记录接口调用信息
         $this->logStat( $this->params );
 
@@ -105,37 +105,35 @@ class StockLogsIdService extends InnerService
 //      上面的属性 $this->allowRequestMethod 用于控制允许的请求方法
 //      上面的属性 $this->defaultParams 用于控制接口入参的类型和必要性
 /*-----------------------------------------------------------------------------------------------------------*/
-//      记录日志：log($key,$value [,$filename]);   $value可以为数组；  
-//      $filename 一般不需要，默认文件名为当前类名(需要做一些处理)  如：UsersIdService (类名) ==> users_id (文件名)  
+//      记录日志：log($key,$value [,$filename]);   $value可以为数组；
+//      $filename 一般不需要，默认文件名为当前类名(需要做一些处理)  如：UsersIdService (类名) ==> users_id (文件名)
 /*-----------------------------------------------------------------------------------------------------------*/
 
 
     /**
      * [get 业务处理入口]
      * @return  Array  处理结果
-     */ 
+     */
     public function get()
     {
-        $logId = $this->params['stock_logs'];
-        $logId = (int)$logId;
-        if(isset($logId)){
-            $data = InvStockLog::get($logId);
-            if($data){
-                $data = $data->toArray();
-                return $this->success($data);
-            }else{
-                return $this->bError(1000);
-            }
-            
+        $limit = 10;
+        $list = InvStockLog::all(function ($query) use($limit){
+            $query->order('id desc')
+                  ->limit($limit);
+        });
+        if($list) {
+            return $this->success($list);
+        }else{
+            return $this->bError(1000);
         }
-        
+
     }
 
 
     /**
      * [post 业务处理入口]
      * @return  Array  处理结果
-     */ 
+     */
     public function post()
     {
 
@@ -152,7 +150,7 @@ class StockLogsIdService extends InnerService
      * @param   [type]  $value  [description]
      * @param   array   $row    [description]
      * @return  [type]          [description]
-     */     
+     */
     public function formatUri($value, $row = [])
     {
         $v = $this->params['apiVersion'];

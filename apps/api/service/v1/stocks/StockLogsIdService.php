@@ -1,17 +1,17 @@
 <?php
-namespace apps\api\service\v\stock;
+namespace apps\api\service\v\stocks;
 
 /**
- * 库存信息
+ * 库存操作记录信息
  *
  * @author  zjh
  * @version 1.0 2018-04-09
  */
 
 use apps\api\service\v\InnerService;
-use apps\common\model\InvStock;
+use apps\common\model\InvStockLog;
 
-class StocksService extends InnerService
+class StockLogsIdService extends InnerService
 {
 
     /**
@@ -19,7 +19,7 @@ class StocksService extends InnerService
      * 可以为：get、post、put、delete、patch
      */
     public $allowRequestMethod = [
-        'get' => 'GET - 取得库存信息集合',
+        'get' => 'GET - 取得库存操作记录信息',
     ];
 
     /**
@@ -30,7 +30,7 @@ class StocksService extends InnerService
      */
     public $defaultParams = [
         'get' => [
-
+            "stock_logs" => ['指定的库存操作记录', 0, PARAM_REQUIRED],
         ],
     ];
 
@@ -44,17 +44,21 @@ class StocksService extends InnerService
     public $defaultResponse = [
         'get' => [
 
-            'stock_id' =>'库存id',
-            'product_id' => '商品id',
-            'store_id' => '店铺id',
-            'thumbnail' => '商品缩略图',
+            'id' => '操作记录id',
+            'user_id' => '用户id',
+            'nick_name' => '用户昵称',
+            'stock_id' => '商品库存id',
             'product_code' => '货号',
-            'sku_content' => '商品的sku相关信息',
-            'stock_amount' => '库存数量',
-            'add_time' => ['添加时间',"formatTime"],
-            'last_update' => ['最近更新时间',"formatTime"],
+            'color' => '颜色',
+            'size' => '尺码',
+            'type' => '操作类型：1 入库操作，2 出库操作',
+            'number' => '出入库的数量',
+            'add_time' => ['记录添加时间（操作时间）','formatTime'],
+            'log' => '额外的说明记录',
+            'amount_left' => '商品的库存剩余量',
             "uri"        => ["当前uri", "formatUri"],
         ],
+
     ];
 
     private static $instance;
@@ -62,7 +66,7 @@ class StocksService extends InnerService
     public static function instance($params = [])
     {
         if (self::$instance == null) {
-            self::$instance         = new StocksService();
+            self::$instance         = new StockLogsIdService();
             self::$instance->params = $params;
             self::$instance->bCodes = require_once __DIR__."/ErrorCode.php";
             self::$instance->debug  = true;    // 开启调试模式，包括日志的输出
@@ -75,10 +79,10 @@ class StocksService extends InnerService
      * 接口响应方法
      */
     public function response()
-    { 
+    {
         //业务日志记录开始
-        $this->log("--------------------- begin","begin -----------------");
-        
+        $this->log("--------------------- begin","begin --------------------");
+
         //记录接口调用信息
         $this->logStat( $this->params );
 
@@ -101,35 +105,37 @@ class StocksService extends InnerService
 //      上面的属性 $this->allowRequestMethod 用于控制允许的请求方法
 //      上面的属性 $this->defaultParams 用于控制接口入参的类型和必要性
 /*-----------------------------------------------------------------------------------------------------------*/
-//      记录日志：log($key,$value [,$filename]);   $value可以为数组；  
-//      $filename 一般不需要，默认文件名为当前类名(需要做一些处理)  如：UsersIdService (类名) ==> users_id (文件名)  
+//      记录日志：log($key,$value [,$filename]);   $value可以为数组；
+//      $filename 一般不需要，默认文件名为当前类名(需要做一些处理)  如：UsersIdService (类名) ==> users_id (文件名)
 /*-----------------------------------------------------------------------------------------------------------*/
 
 
     /**
      * [get 业务处理入口]
      * @return  Array  处理结果
-     */ 
+     */
     public function get()
     {
-        $limit = 10;
-        $list = InvStock::all(function ($query) use($limit){
-            $query->order('stock_id desc')
-                  ->limit($limit);
-        });
-        if($list) {
-            return $this->success($list);
-        }else{
-            return $this->bError(1000);
+        $logId = $this->params['stock_logs'];
+        $logId = (int)$logId;
+        if(isset($logId)){
+            $data = InvStockLog::get($logId);
+            if($data){
+                $data = $data->toArray();
+                return $this->success($data);
+            }else{
+                return $this->bError(1000);
+            }
+
         }
-        
+
     }
 
 
     /**
      * [post 业务处理入口]
      * @return  Array  处理结果
-     */ 
+     */
     public function post()
     {
 
@@ -146,11 +152,11 @@ class StocksService extends InnerService
      * @param   [type]  $value  [description]
      * @param   array   $row    [description]
      * @return  [type]          [description]
-     */     
+     */
     public function formatUri($value, $row = [])
     {
         $v = $this->params['apiVersion'];
-        return base_uri() . 'api/' . $v . '/stock/stocks/' . $row['stock_id'];
+        return base_uri() . 'api/' . $v . '/stock/stock_logs/' . $row['id'];
     }
 
 }

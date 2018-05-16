@@ -210,6 +210,8 @@ class InnerService extends ApiService
 
             $this->openId = $MemberData['open_id'];  //微信的open_id
             $this->userData = $MemberData->user;
+            // 暂时先实现单店铺的场景
+            $this->storeId = $MemberData->user->stores[0]->store_id;
 
             return true;
         }
