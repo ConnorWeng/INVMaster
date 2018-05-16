@@ -11,6 +11,7 @@ namespace apps\api\service\v\stocks;
 use apps\api\service\v\InnerService;
 use apps\common\model\InvStock;
 use apps\common\model\InvStockSku;
+use apps\common\model\InvStockLog;
 
 class StocksService extends InnerService
 {
@@ -21,6 +22,7 @@ class StocksService extends InnerService
         parent::__construct();
         $this->stockModel = new InvStock;
         $this->stockSkuModel = new InvStockSku;
+        $this->stockLogModel = new InvStockLog;
     }
 
     /**
@@ -167,12 +169,14 @@ class StocksService extends InnerService
             $stockSku->stock_amount = $stockSku->stock_amount + intval($this->params['stock_amount']);
             $stockSku->save();
         } else {
-            $this->stockSkuModel->data([
+            $stockSku = $this->stockSkuModel->data([
                 'stock_id' => $this->stockModel->stock_id,
                 'color' => $this->params['color'],
                 'size' => $this->params['size'],
-                'stock_amount' => $this->params['stock_amount']])->save();
+                'stock_amount' => $this->params['stock_amount']]);
+            $stockSku->save();
         }
+        $this->stockLogModel->log($this->userData, $stockSku, 1, $this->params['stock_amount']);
         return $this->success('ok');
     }
 
@@ -185,6 +189,7 @@ class StocksService extends InnerService
                 $sku->stock->stock_amount = $sku->stock->stock_amount - $stockAmount;
                 $sku->stock->save();
                 $sku->save();
+                $this->stockLogModel->log($this->userData, $sku, 2, $this->params['stock_amount']);
                 return $this->success('ok');
             } else {
                 return $this->bError(4001);

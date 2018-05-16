@@ -15,14 +15,29 @@ use think\Model;
 class InvStockLog extends Model {
 
 
-	/**
-	 * 获取一个数据
-	 * @param   [type]  $id  [description]
-	 * @return  [type]       [description]
-	 */
+    /**
+     * 获取一个数据
+     * @param   [type]  $id  [description]
+     * @return  [type]       [description]
+     */
     public function stockLog($id)
     {
-    	
+
+    }
+
+    public function log($user, $sku, $type, $amount) {
+        $this->data([
+            'user_id' => $user->user_id,
+            'nick_name' => $user->wx_nick_name,
+            'stock_id' => $sku->stock_id,
+            'product_code' => $sku->stock->product_code,
+            'color' => $sku->color,
+            'size' => $sku->size,
+            'type' => $type,
+            'number' => $amount,
+            'log' => '',
+            'amount_left' => $sku->stock_amount,
+        ])->save();
     }
 
 
