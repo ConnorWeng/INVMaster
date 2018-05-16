@@ -29,6 +29,7 @@ class StocksService extends InnerService
      */
     public $allowRequestMethod = [
         'post' => 'POST - 入库',
+        'delete' => 'DELETE - 出库'
     ];
 
     /**
@@ -43,6 +44,10 @@ class StocksService extends InnerService
             "color" => ['颜色', '', 1],
             "size" => ['尺码', '', 1],
             "stock_amount" => ['数量', 0, 1]
+        ],
+        'delete' => [
+            'sku_id' => ['sku id', 0, 1],
+            'stock_amount' => ['数量', 0, 1]
         ],
     ];
 
@@ -171,7 +176,23 @@ class StocksService extends InnerService
         return $this->success('ok');
     }
 
-
+    public function delete() {
+        $sku = $this->stockSkuModel->get($this->params['sku_id']);
+        if ($sku) {
+            $stockAmount = intval($this->params['stock_amount']);
+            if ($stockAmount > 0 && $stockAmount < $sku->stock_amount) {
+                $sku->stock_amount = $sku->stock_amount - $stockAmount;
+                $sku->stock->stock_amount = $sku->stock->stock_amount - $stockAmount;
+                $sku->stock->save();
+                $sku->save();
+                return $this->success('ok');
+            } else {
+                return $this->bError(4001);
+            }
+        } else {
+            return $this->bError(4000);
+        }
+    }
 
 
 
