@@ -11,7 +11,7 @@ namespace apps\api\service\v\stocks;
 use apps\api\service\v\InnerService;
 use apps\common\model\InvStockLog;
 
-class StockLogsService extends InnerService
+class LogsService extends InnerService
 {
 
     /**
@@ -43,22 +43,22 @@ class StockLogsService extends InnerService
      */
     public $defaultResponse = [
         'get' => [
-
-            'id' => '操作记录id',
-            'user_id' => '用户id',
-            'nick_name' => '用户昵称',
-            'stock_id' => '商品库存id',
-            'product_code' => '货号',
-            'color' => '颜色',
-            'size' => '尺码',
-            'type' => '操作类型：1 入库操作，2 出库操作',
-            'number' => '出入库的数量',
-            'add_time' => ['记录添加时间（操作时间）','formatTime'],
-            'log' => '额外的说明记录',
-            'amount_left' => '商品的库存剩余量',
-            "uri"        => ["当前uri", "formatUri"],
+            // 'logs' => [
+            //     'id' => '操作记录id',
+            //     'user_id' => '用户id',
+            //     'nick_name' => '用户昵称',
+            //     'stock_id' => '商品库存id',
+            //     'product_code' => '货号',
+            //     'color' => '颜色',
+            //     'size' => '尺码',
+            //     'type' => '操作类型：1 入库操作，2 出库操作',
+            //     'number' => '出入库的数量',
+            //     'add_time' => ['记录添加时间（操作时间）','formatTime'],
+            //     'log' => '额外的说明记录',
+            //     'amount_left' => '商品的库存剩余量',
+            //     "uri" => ["当前uri", "formatUri"],
+            // ],
         ],
-
     ];
 
     private static $instance;
@@ -66,7 +66,7 @@ class StockLogsService extends InnerService
     public static function instance($params = [])
     {
         if (self::$instance == null) {
-            self::$instance         = new StockLogsService();
+            self::$instance         = new LogsService();
             self::$instance->params = $params;
             self::$instance->bCodes = require_once __DIR__."/ErrorCode.php";
             self::$instance->debug  = true;    // 开启调试模式，包括日志的输出
@@ -116,13 +116,16 @@ class StockLogsService extends InnerService
      */
     public function get()
     {
-        $limit = 10;
+        $start = empty($this->params['start']) ? 0 : intval($this->params['start']);
+        // FIXME: hard code
+        $limit = 20;
         $list = InvStockLog::all(function ($query) use($limit){
-            $query->order('id desc')
-                  ->limit($limit);
+                $query->order('id desc')->limit($limit);
         });
         if($list) {
-            return $this->success($list);
+            return $this->success([
+                '_links' => ['next' => count($list) === $limit ? '/api/v1/stocks/logs?limit='.$limit.'&start='.($start + count($list)) : ''],
+                'logs' => $list]);
         }else{
             return $this->bError(1000);
         }
