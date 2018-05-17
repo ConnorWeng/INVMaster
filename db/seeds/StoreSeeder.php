@@ -29,7 +29,8 @@ class StoreSeeder extends AbstractSeed
             'im_ww' => 'wangwang',
             'im_wx' => 'wxwx',
             'add_time' => '1526484718',
-            'end_time' => '1626484718'])
+            'end_time' => '1626484718',
+            'market_name' => '大西豪'])
                 ->save();
 
         $store_id = $this->query("select max(store_id) from inv_store")->fetch()[0];
