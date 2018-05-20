@@ -46,4 +46,8 @@ class InvStockLog extends Model {
             'out' => $this->where(['stock_id' => $stockId, 'type' => 2])->sum('number')];
     }
 
+    public function stocksSummary($storeId, $start, $limit) {
+        return $this->field(['stock_id,product_code,type,sum(number) as number'])->where('store_id', $storeId)->group('stock_id,type')->limit($start, $limit)->select();
+    }
+
 }
