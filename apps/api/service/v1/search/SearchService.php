@@ -117,10 +117,10 @@ class SearchService extends InnerService
         }
         $stock = $this->stockModel->searchByProductCode($this->store->store_id, $this->params['product_code']);
         if ($stock) {
-            $log = $this->stockLogModel->summary($stock->stock_id);
+            $summary = $this->stockLogModel->stockSummary($stock->stock_id);
             $this->success([
                 'stock' => $stock,
-                'log' => $log]);
+                'summary' => $summary]);
         } else {
             $this->bError(1001);
         }
