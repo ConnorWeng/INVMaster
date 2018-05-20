@@ -10,6 +10,7 @@ namespace apps\api\service\v\home;
 
 use apps\api\service\v\InnerService;
 use apps\common\model\InvStock;
+use apps\common\model\InvProduct;
 
 class HomeService extends InnerService
 {
@@ -19,6 +20,7 @@ class HomeService extends InnerService
     public function __construct() {
         parent::__construct();
         $this->stockModel = new InvStock;
+        $this->productModel = new InvProduct;
     }
 
     /**
@@ -113,19 +115,14 @@ class HomeService extends InnerService
         $start = empty($this->params['start']) ? 0 : intval($this->params['start']);
         // FIXME: hard code
         $limit = 20;
-        $stores = $this->userData->stores;
-        if (count($stores) > 0) {
-            // 暂时先实现单店铺的场景
-            $storeProducts = $this->stockModel->getStoreProducts($stores[0]->store_id, $limit, $start);
-            $this->success([
-                '_links' => ['next' => count($storeProducts) === $limit ? '/api/v1/home?limit=20&start='.($start + count($storeProducts)) : ''],
-                'store' => $stores[0],
-                'store_products' => $storeProducts,
-                'sync_products' => [],
-            ]);
-        } else {
-            $this->bError(1000);
-        }
+        $storeProducts = $this->stockModel->getStoreProducts($this->store->store_id, $limit, $start);
+        $latestProducts = $this->productModel->getLatestProduct($this->store->store_id);
+        $this->success([
+            '_links' => ['next' => count($storeProducts) === $limit ? '/api/v1/home?limit=20&start='.($start + count($storeProducts)) : ''],
+            'store' => $this->store,
+            'store_products' => $storeProducts,
+            'sync_products' => $latestProducts,
+        ]);
     }
 
 

@@ -155,7 +155,7 @@ class StocksService extends InnerService
         $stock = $this->stockModel->get(['product_code' => $this->params['product_code']]);
         if (!$stock) {
             $this->stockModel->data([
-                'store_id' => $this->storeId,
+                'store_id' => $this->store->store_id,
                 'product_code' => $this->params['product_code'],
                 'sku_content' => '颜色：'.$this->params['color'].'，尺码：'.$this->params['size'],
                 'stock_amount' => $this->params['stock_amount']])->save();

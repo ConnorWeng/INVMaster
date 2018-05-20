@@ -18,9 +18,12 @@ class InvStock extends Model {
         return $this->hasMany('InvStockSku', 'stock_id');
     }
 
+    public function product() {
+        return $this->hasOne('InvProduct', 'product_id', 'product_id');
+    }
+
     public function getStoreProducts($storeId, $limit, $start) {
-        $relateModel = $this->hasManyThrough('InvStock', 'InvUserStoreRelate');
-        return $relateModel->where('store_id', $storeId)->limit($start, $limit)->select();
+        return $this->with('product')->where('store_id', $storeId)->limit($start, $limit)->select();
     }
 
     public function searchByProductCode($storeId, $productCode) {
