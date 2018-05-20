@@ -10,6 +10,7 @@ namespace apps\api\service\v\search;
 
 use apps\api\service\v\InnerService;
 use apps\common\model\InvStock;
+use apps\common\model\InvStockLog;
 
 class SearchService extends InnerService
 {
@@ -18,6 +19,7 @@ class SearchService extends InnerService
     public function __construct() {
         parent::__construct();
         $this->stockModel = new InvStock;
+        $this->stockLogModel = new InvStockLog;
     }
 
     /**
@@ -113,12 +115,12 @@ class SearchService extends InnerService
             $this->bError(1000);
             return;
         }
-        $stores = $this->userData->stores;
-        if (count($stores) > 0) {
-            // 暂时先实现单店铺的场景
-            $stock = $this->stockModel->searchByProductCode($stores[0]->store_id, $this->params['product_code']);
-            $stock->skus;
-            $this->success($stock);
+        $stock = $this->stockModel->searchByProductCode($this->store->store_id, $this->params['product_code']);
+        if ($stock) {
+            $log = $this->stockLogModel->summary($stock->stock_id);
+            $this->success([
+                'stock' => $stock,
+                'log' => $log]);
         } else {
             $this->bError(1001);
         }

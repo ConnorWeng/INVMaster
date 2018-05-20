@@ -40,5 +40,10 @@ class InvStockLog extends Model {
         ])->save();
     }
 
+    public function summary($stockId) {
+        return [
+            'in' => $this->where(['stock_id' => $stockId, 'type' => 1])->sum('number'),
+            'out' => $this->where(['stock_id' => $stockId, 'type' => 2])->sum('number')];
+    }
 
 }
