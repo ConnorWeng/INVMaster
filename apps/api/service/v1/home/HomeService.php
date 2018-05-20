@@ -115,13 +115,13 @@ class HomeService extends InnerService
         $start = empty($this->params['start']) ? 0 : intval($this->params['start']);
         // FIXME: hard code
         $limit = 20;
-        $storeProducts = $this->stockModel->getStoreProducts($this->store->store_id, $limit, $start);
+        $stocks = $this->stockModel->getStocks($this->store->store_id, $limit, $start);
         $latestProducts = $this->productModel->getLatestProduct($this->store->store_id);
         $this->success([
-            '_links' => ['next' => count($storeProducts) === $limit ? '/api/v1/home?limit=20&start='.($start + count($storeProducts)) : ''],
+            '_links' => ['next' => count($stocks) === $limit ? '/api/v1/home?limit=20&start='.($start + count($stocks)) : ''],
             'store' => $this->store,
-            'store_products' => $storeProducts,
-            'sync_products' => $latestProducts,
+            'stocks' => $stocks,
+            'products' => $latestProducts,
         ]);
     }
 

@@ -22,7 +22,7 @@ class InvStock extends Model {
         return $this->hasOne('InvProduct', 'product_id', 'product_id');
     }
 
-    public function getStoreProducts($storeId, $limit, $start) {
+    public function getStocks($storeId, $limit, $start) {
         return $this->with('product')->where('store_id', $storeId)->limit($start, $limit)->select();
     }
 
