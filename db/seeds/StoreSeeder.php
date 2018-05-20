@@ -7,16 +7,10 @@ class StoreSeeder extends AbstractSeed
 {
     public function run()
     {
-        $store_id = $this->query("select store_id from inv_store where store_name = 'seed店铺'")->fetch()[0];
-        if ($store_id) {
-            $this->execute("delete from inv_stock_sku where stock_id in (select stock_id from inv_store where store_id = {$store_id})");
-            $this->execute("delete from inv_store where store_id = ".$store_id);
-            $this->execute("delete from inv_user_store_relate where store_id = ".$store_id);
-            $this->execute("delete from inv_stock where store_id = ".$store_id);
-        }
-
         $inv_store = $this->table('inv_store');
+        $inv_store->truncate();
         $inv_store->insert([
+            'store_id' => 1,
             'store_name' => 'seed店铺',
             'owner_name' => 'Connor Weng',
             'store_logo' => '',
@@ -33,22 +27,65 @@ class StoreSeeder extends AbstractSeed
             'market_name' => '大西豪'])
                 ->save();
 
-        $store_id = $this->query("select max(store_id) from inv_store")->fetch()[0];
-        $user_id = $this->query("select user_id from inv_user where open_id = 'oRBw65KX7KN23HeMx7mCyJ-u6dbw'")->fetch()[0];
+        $inv_user_store_relate = $this->table('inv_user_store_relate');
+        $inv_user_store_relate->truncate();
+        $inv_user_store_relate->insert(['user_id' => 1, 'store_id' => 1])->save();
 
-        $this->table('inv_user_store_relate')->insert(['user_id' => $user_id, 'store_id' => $store_id])->save();
-        $this->table('inv_stock')->insert([
-            'store_id' => $store_id,
-            'thumbnail' => '',
-            'product_code' => '6887',
-            'sku_content' => '颜色：红色，尺码：XL',
-            'stock_amount' => 150])->save();
+        $inv_stock = $this->table('inv_stock');
+        $inv_stock->truncate();
+        $inv_stock->insert([
+            'stock_id' => 1,
+            'product_id' => 1,
+            'store_id' => 1,
+            'stock_amount' => 150,
+            'add_time' => 1526822490,
+            'last_update' => 1526822490])->save();
 
-        $stock_id = $this->query('select max(stock_id) from inv_stock')->fetch()[0];
+        $inv_product = $this->table('inv_product');
+        $inv_product->truncate();
+        $inv_product->insert([
+            'product_id' => 1,
+            'store_id' => 1,
+            'product_code' => '6888',
+            'product_name' => '测试商品1',
+            'vendor' => 1,
+            'add_time' => 1526822490,
+            'last_update' => 1526822490])->save();
 
-        $this->table('inv_stock_sku')->insert([
-            ['stock_id' => $stock_id, 'color' => '红色', 'size' => 'XL', 'stock_amount' => 50],
-            ['stock_id' => $stock_id, 'color' => '黄色', 'size' => 'L', 'stock_amount' => 50],
-            ['stock_id' => $stock_id, 'color' => '蓝色', 'size' => 'M', 'stock_amount' => 50]])->save();
+        $inv_stock_sku = $this->table('inv_stock_sku');
+        $inv_stock_sku->truncate();
+        $inv_stock_sku->insert([
+            ['stock_id' => 1, 'color' => '红色', 'size' => 'XL', 'stock_amount' => 50],
+            ['stock_id' => 1, 'color' => '黄色', 'size' => 'L', 'stock_amount' => 50],
+            ['stock_id' => 1, 'color' => '蓝色', 'size' => 'M', 'stock_amount' => 50]])->save();
+
+        $inv_stock_log = $this->table('inv_stock_log');
+        $inv_stock_log->truncate();
+        $inv_stock_log->insert([
+            'user_id' => 1,
+            'nick_name' => 'Connor.W',
+            'stock_id' => 1,
+            'store_id' => 1,
+            'product_code' => '6888',
+            'color' => '红色',
+            'size' => 'XL',
+            'type' => 1,
+            'number' => 100,
+            'log' => '',
+            'add_time' => 1526822490,
+            'amount_left' => 100])->save();
+        $inv_stock_log->insert([
+            'user_id' => 1,
+            'nick_name' => 'Connor.W',
+            'stock_id' => 1,
+            'store_id' => 1,
+            'product_code' => '6888',
+            'color' => '红色',
+            'size' => 'XL',
+            'type' => 2,
+            'number' => 50,
+            'log' => '',
+            'add_time' => 1526822590,
+            'amount_left' => 50])->save();
     }
 }

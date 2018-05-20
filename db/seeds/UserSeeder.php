@@ -7,8 +7,8 @@ class UserSeeder extends AbstractSeed
 {
     public function run()
     {
-        $this->execute("DELETE FROM wx_session_info where open_id = 'oRBw65KX7KN23HeMx7mCyJ-u6dbw'");
         $wx_session_info = $this->table('wx_session_info');
+        $wx_session_info->truncate();
         $wx_session_info->insert([
             'open_id' => 'oRBw65KX7KN23HeMx7mCyJ-u6dbw',
             'uuid' => '297b6b794c762bcb5135ed03718ab03f',
@@ -19,9 +19,10 @@ class UserSeeder extends AbstractSeed
             'user_info' => '{"openId":"oRBw65KX7KN23HeMx7mCyJ-u6dbw","nickName":"Connor.W","gender":1,"language":"zh_CN","city":"Pudong New District","province":"Shanghai","country":"China","avatarUrl":"https://wx.qlogo.cn/mmopen/vi_32/DYAIOgq83eq5G5iaJNoq4zDSjTYcjV2ZAyydzwEOXBo87Z6nJ0yqA7pvxhkVmJicquHZKAop7tgjDufaics9iawpRA/132","watermark":{"timestamp":1526058180,"appid":"wxf055c7a111fd4d2b"}}'])
                 ->save();
 
-        $this->execute("DELETE FROM inv_user where open_id = 'oRBw65KX7KN23HeMx7mCyJ-u6dbw'");
         $inv_user = $this->table('inv_user');
+        $inv_user->truncate();
         $inv_user->insert([
+            'user_id' => 1,
             'open_id' => 'oRBw65KX7KN23HeMx7mCyJ-u6dbw',
             'wx_nick_name' => 'Connor.W',
             'wx_avatar_url' => 'https://wx.qlogo.cn/mmopen/vi_32/DYAIOgq83eq5G5iaJNoq4zDSjTYcjV2ZAyydzwEOXBo87Z6nJ0yqA7pvxhkVmJicquHZKAop7tgjDufaics9iawpRA/132',
