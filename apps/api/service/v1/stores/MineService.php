@@ -115,7 +115,7 @@ class MineService extends InnerService
         $this->success([
             '_links' => ['next' => count($stocks) === $limit ? '/api/v1/home?limit=20&start='.($start + count($stocks)) : ''],
             'store' => $this->store,
-            'stocks' => $stocks,
+            'stocks' => $this->mergeStocks($stocks),
         ]);
     }
 
@@ -148,5 +148,31 @@ class MineService extends InnerService
         return base_uri() . 'api/' . $v . '/stores/id/' . $row['stock_id'];
     }
 
+    private function mergeStocks($stocks) {
+        $mergedStocks = [];
+        foreach ($stocks as $stock) {
+            $found = false;
+            foreach ($mergedStocks as $merged) {
+                if ($merged->stock_id === $stock->stock_id) {
+                    $merged[$this->stockType($stock->type)] = $stock->number;
+                    $found = true;
+                }
+            }
+            if (!$found) {
+                $stock[$this->stockType($stock->type)] = $stock->number;
+                unset($stock['number']);
+                unset($stock['type']);
+                $mergedStocks[] = $stock;
+            }
+        }
+        return $mergedStocks;
+    }
 
+    private function stockType($type) {
+        if ($type === 1) {
+            return 'in';
+        } else if ($type === 2) {
+            return 'out';
+        }
+    }
 }
