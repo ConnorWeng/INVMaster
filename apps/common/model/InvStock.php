@@ -27,7 +27,7 @@ class InvStock extends Model {
     }
 
     public function searchByProductCode($storeId, $productCode) {
-        return $this->hasWhere('product', ['store_id' => $storeId, 'product_code' => $productCode])->with('product')->find();
+        return $this->hasWhere('product', ['store_id' => $storeId, 'product_code' => $productCode])->with('product,skus')->find();
     }
 
 }
