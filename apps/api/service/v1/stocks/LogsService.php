@@ -14,6 +14,11 @@ use apps\common\model\InvStockLog;
 class LogsService extends InnerService
 {
 
+    public function __construct() {
+        parent::__construct();
+        $this->stockLogModel = new InvStockLog;
+    }
+
     /**
      * 允许的请求方式
      * 可以为：get、post、put、delete、patch
@@ -117,11 +122,10 @@ class LogsService extends InnerService
     public function get()
     {
         $start = empty($this->params['start']) ? 0 : intval($this->params['start']);
+        $type = empty($this->params['type']) ? 0 : $this->params['type'];
         // FIXME: hard code
         $limit = 20;
-        $list = InvStockLog::all(function ($query) use($limit){
-                $query->order('id desc')->limit($limit);
-        });
+        $list = $this->stockLogModel->getLogs($this->store->store_id, $type, $start, $limit);
         if($list) {
             return $this->success([
                 '_links' => ['next' => count($list) === $limit ? '/api/v1/stocks/logs?limit='.$limit.'&start='.($start + count($list)) : ''],

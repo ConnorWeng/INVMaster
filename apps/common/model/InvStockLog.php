@@ -50,4 +50,11 @@ class InvStockLog extends Model {
         return $this->field(['stock_id,product_code,type,sum(number) as number'])->where('store_id', $storeId)->group('stock_id,type')->limit($start, $limit)->select();
     }
 
+    public function getLogs($storeId, $type, $start, $limit) {
+        $where = ['store_id' => $storeId];
+        if ($type !== 0) {
+            $where['type'] = $type;
+        }
+        return $this->where($where)->order('id desc')->limit($start, $limit)->select();
+    }
 }
