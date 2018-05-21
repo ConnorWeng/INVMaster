@@ -43,21 +43,21 @@ class LogsService extends InnerService
      */
     public $defaultResponse = [
         'get' => [
-            // 'logs' => [
-            //     'id' => '操作记录id',
-            //     'user_id' => '用户id',
-            //     'nick_name' => '用户昵称',
-            //     'stock_id' => '商品库存id',
-            //     'product_code' => '货号',
-            //     'color' => '颜色',
-            //     'size' => '尺码',
-            //     'type' => '操作类型：1 入库操作，2 出库操作',
-            //     'number' => '出入库的数量',
-            //     'add_time' => ['记录添加时间（操作时间）','formatTime'],
-            //     'log' => '额外的说明记录',
-            //     'amount_left' => '商品的库存剩余量',
-            //     "uri" => ["当前uri", "formatUri"],
-            // ],
+            'logs' => [
+                'id' => '操作记录id',
+                'user_id' => '用户id',
+                'nick_name' => '用户昵称',
+                'stock_id' => '商品库存id',
+                'product_code' => '货号',
+                'color' => '颜色',
+                'size' => '尺码',
+                'type' => '操作类型：1 入库操作，2 出库操作',
+                'number' => '出入库的数量',
+                'add_time' => ['记录添加时间（操作时间）','formatTime'],
+                'log' => '额外的说明记录',
+                'amount_left' => '商品的库存剩余量',
+                // "uri" => ["当前uri", "formatUri"],
+            ],
         ],
     ];
 
