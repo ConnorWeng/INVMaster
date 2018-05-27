@@ -12,17 +12,20 @@ use apps\api\service\v\InnerService;
 use apps\common\model\InvStock;
 use apps\common\model\InvStockSku;
 use apps\common\model\InvStockLog;
+use apps\common\model\InvProduct;
 
 class StocksService extends InnerService
 {
     private $stockModel;
     private $stockSkuModel;
+    private $productModel;
 
     public function __construct() {
         parent::__construct();
         $this->stockModel = new InvStock;
         $this->stockSkuModel = new InvStockSku;
         $this->stockLogModel = new InvStockLog;
+        $this->productModel = new InvProduct;
     }
 
     /**
@@ -152,25 +155,27 @@ class StocksService extends InnerService
     public function post()
     {
         // FIXME: use transaction
-        $stock = $this->stockModel->get(['product_code' => $this->params['product_code']]);
+        $stock = $this->stockModel->searchByProductCode($this->store->store_id, $this->params['product_code']);
         if (!$stock) {
+            $productId = $this->getProductId();
             $this->stockModel->data([
                 'store_id' => $this->store->store_id,
-                'product_code' => $this->params['product_code'],
-                'sku_content' => '颜色：'.$this->params['color'].'，尺码：'.$this->params['size'],
+                'product_id' => $productId,
                 'stock_amount' => $this->params['stock_amount']])->save();
+            $stockId = $this->stockModel->stock_id;
         } else {
             $stock->stock_amount = $stock->stock_amount + intval($this->params['stock_amount']);
             $stock->save();
+            $stockId = $stock->stock_id;
         }
         // TODO: increase amount if sku exists, otherwise insert a new sku. After that update stock amount
-        $stockSku = $this->stockSkuModel->getSku($this->params['product_code'], $this->params['color'], $this->params['size']);
+        $stockSku = $this->stockSkuModel->getSku($stockId, $this->params['color'], $this->params['size']);
         if ($stockSku) {
             $stockSku->stock_amount = $stockSku->stock_amount + intval($this->params['stock_amount']);
             $stockSku->save();
         } else {
             $stockSku = $this->stockSkuModel->data([
-                'stock_id' => $this->stockModel->stock_id,
+                'stock_id' => $stockId,
                 'color' => $this->params['color'],
                 'size' => $this->params['size'],
                 'stock_amount' => $this->params['stock_amount']]);
@@ -178,6 +183,18 @@ class StocksService extends InnerService
         }
         $this->stockLogModel->log($this->userData, $stockSku, 1, $this->params['stock_amount']);
         return $this->success('ok');
+    }
+
+    private function getProductId() {
+        $product = $this->productModel->get(['store_id' => $this->store->store_id, 'product_code' => $this->params['product_code']]);
+        if ($product) {
+            return $product->product_id;
+        } else {
+            $this->productModel->data([
+                'store_id' => $this->store->store_id,
+                'product_code' => $this->params['product_code']])->save();
+            return $this->productModel->product_id;
+        }
     }
 
     public function delete() {

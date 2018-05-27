@@ -11,9 +11,9 @@ class InvStockSku extends Model {
         return $this->hasOne('InvStock', 'stock_id', 'stock_id');
     }
 
-    public function getSku($productCode, $color, $size) {
+    public function getSku($stockId, $color, $size) {
         return $this->hasWhere('stock', [
-            'product_code' => $productCode,
+            'stock_id' => $stockId,
             'InvStockSku.color' => $color,
             'InvStockSku.size' => $size])->find();
     }
