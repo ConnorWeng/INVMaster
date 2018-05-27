@@ -201,7 +201,7 @@ class StocksService extends InnerService
         $sku = $this->stockSkuModel->get($this->params['sku_id']);
         if ($sku) {
             $stockAmount = intval($this->params['stock_amount']);
-            if ($stockAmount > 0 && $stockAmount < $sku->stock_amount) {
+            if ($stockAmount > 0 && $stockAmount <= $sku->stock_amount) {
                 $sku->stock_amount = $sku->stock_amount - $stockAmount;
                 $sku->stock->stock_amount = $sku->stock->stock_amount - $stockAmount;
                 $sku->stock->save();
