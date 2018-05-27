@@ -6,7 +6,7 @@
 // +----------------------------------------------------------------------
 // | Date: 2018-04-27
 // +----------------------------------------------------------------------
- 
+
 namespace apps\common\qcloud\auth;
 // namespace QCloud_WeApp_SDK\Auth;
 
@@ -15,6 +15,7 @@ use apps\common\qcloud\Constants as Constants;
 use apps\common\qcloud\helper\Request as Request;
 use apps\common\model\WxSessionInfo as WxSessionInfo;
 use apps\common\model\InvUser as InvUser;
+use apps\common\model\InvUserStoreRelate as InvUserStoreRelate;
 
 class AuthAPI {
     /**
@@ -30,7 +31,7 @@ class AuthAPI {
 
         // 2. 生成 3rd key (skey)
         $skey = sha1($sessionKey . mt_rand());
-        
+
         /**
          * 3. 解密数据
          * 由于官方的解密方法不兼容 PHP 7.1+ 的版本
@@ -61,8 +62,23 @@ class AuthAPI {
         $operate = WxSessionInfo::storeUserInfo($userinfo, $skey, $sessionKey,$withUserinfo);
         InvUser::wxStoreUserInfo($userinfo,$withUserinfo);
 
+        // debug 模式下都关联到 store 1，方便测试
+        if (config('app_debug')) {
+            $user = InvUser::get(['open_id' => $openId]);
+            $relateInfo = InvUserStoreRelate::get(['user_id' => $user->user_id]);
+            if ($relateInfo) {
+                $relate = new InvUserStoreRelate;
+                $relate->save(['store_id' => 1], ['id' => $relateInfo->id]);
+            } else {
+                $relate = new InvUserStoreRelate;
+                $relate->user_id = $user->user_id;
+                $relate->store_id = 1;
+                $relate->save();
+            }
+        }
+
         $userinfo = json_decode($data,true);  //zjh 转换为数组
-        
+
         return [
             'loginState' => Constants::S_AUTH,
             'userinfo' => compact('userinfo', 'skey','operate')
@@ -79,7 +95,7 @@ class AuthAPI {
         /**
          * 使用小程序的 AppID 和 AppSecret 获取 session key
          */
-        
+
         $appId = config('api.appId');
         $appSecret = config('api.appSecret');
         list($session_key, $openid) = array_values(self::getSessionKeyDirectly($appId, $appSecret, $code));
@@ -104,7 +120,7 @@ class AuthAPI {
 
         list($status, $body) = array_values(Request::get([
             'url' => 'https://api.weixin.qq.com/sns/jscode2session?' . http_build_query($requestParams),
-            'timeout' => config('api.networkTimeout') 
+            'timeout' => config('api.networkTimeout')
         ]));
 
         if ($status !== 200 || !$body || isset($body['errcode'])) {
