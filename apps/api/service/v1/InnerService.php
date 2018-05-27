@@ -31,7 +31,7 @@ class InnerService extends ApiService
 
     public $userId = '';
 
-    private $wxSessionInfoModel;
+    protected $wxSessionInfoModel;
 
     private static $instance;
 
@@ -209,6 +209,7 @@ class InnerService extends ApiService
             }
 
             $this->openId = $MemberData['open_id'];  //微信的open_id
+            $this->userInfo = $MemberData->user_info;
             $this->userData = $MemberData->user;
             // 暂时先实现单店铺的场景
             $this->store = $MemberData->user->stores[0];

@@ -11,8 +11,13 @@ namespace apps\api\service\v\auth;
 use apps\api\service\v\InnerService;
 use apps\common\model\WxSessionInfo;
 
+
 class UsersService extends InnerService
 {
+
+    public function __construct() {
+        parent::__construct();
+    }
 
     /**
      * 允许的请求方式
@@ -66,10 +71,10 @@ class UsersService extends InnerService
      * 接口响应方法
      */
     public function response()
-    { 
+    {
         //业务日志记录开始
         $this->log("--------------------- begin","begin -----------------");
-        
+
         //记录接口调用信息
         $this->logStat( $this->params );
 
@@ -92,27 +97,21 @@ class UsersService extends InnerService
 //      上面的属性 $this->allowRequestMethod 用于控制允许的请求方法
 //      上面的属性 $this->defaultParams 用于控制接口入参的类型和必要性
 /*-----------------------------------------------------------------------------------------------------------*/
-//      记录日志：log($key,$value [,$filename]);   $value可以为数组；  
-//      $filename 一般不需要，默认文件名为当前类名(需要做一些处理)  如：UsersIdService (类名) ==> users_id (文件名)  
+//      记录日志：log($key,$value [,$filename]);   $value可以为数组；
+//      $filename 一般不需要，默认文件名为当前类名(需要做一些处理)  如：UsersIdService (类名) ==> users_id (文件名)
 /*-----------------------------------------------------------------------------------------------------------*/
 
 
     /**
      * [get 业务处理入口]
      * @return  Array  处理结果
-     */ 
+     */
     public function get()
     {
-        $token = $this->params['token'];
-
-        $result = WxSessionInfo::findUserBySKey($token);
-
-        if ($result) {
-            $data = json_decode($result['user_info'], true);
+        if ($this->userInfo) {
+            $data = json_decode($this->userInfo, true);
             $this->success($data);
-
         } else {
-          
             $this->bError(1000);
         }
     }
@@ -121,7 +120,7 @@ class UsersService extends InnerService
     /**
      * [post 业务处理入口]
      * @return  Array  处理结果
-     */ 
+     */
     public function post()
     {
 
@@ -138,11 +137,11 @@ class UsersService extends InnerService
      * @param   [type]  $value  [description]
      * @param   array   $row    [description]
      * @return  [type]          [description]
-     */     
+     */
     public function formatUri($value, $row = [])
     {
         $v = $this->params['apiVersion'];
-        //zjh 此处可自行调整为合理的uri    
+        //zjh 此处可自行调整为合理的uri
         return base_uri() . 'api/' . $v . '/auth/users/' . $row['open_id'];
     }
 
