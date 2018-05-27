@@ -36,6 +36,7 @@ class InvStockLog extends Model {
             'size' => $sku->size,
             'type' => $type,
             'number' => $amount,
+            'add_time' => time(),
             'log' => '',
             'amount_left' => $sku->stock_amount,
         ])->save();
