@@ -33,6 +33,7 @@ class StocksService extends InnerService
      * 可以为：get、post、put、delete、patch
      */
     public $allowRequestMethod = [
+        'get' => 'GET - 库存列表',
         'post' => 'POST - 入库',
         'delete' => 'DELETE - 出库'
     ];
@@ -64,19 +65,18 @@ class StocksService extends InnerService
      * 既适用于单个数组，也适用于数组列表中的每一个数组元素
      */
     public $defaultResponse = [
-        'get' => [
-
-            'stock_id' =>'库存id',
-            'product_id' => '商品id',
-            'store_id' => '店铺id',
-            'thumbnail' => '商品缩略图',
-            'product_code' => '货号',
-            'sku_content' => '商品的sku相关信息',
-            'stock_amount' => '库存数量',
-            'add_time' => ['添加时间',"formatTime"],
-            'last_update' => ['最近更新时间',"formatTime"],
-            "uri"        => ["当前uri", "formatUri"],
-        ],
+        // 'get' => [
+        //     'stock_id' =>'库存id',
+        //     'product_id' => '商品id',
+        //     'store_id' => '店铺id',
+        //     'thumbnail' => '商品缩略图',
+        //     'product_code' => '货号',
+        //     'sku_content' => '商品的sku相关信息',
+        //     'stock_amount' => '库存数量',
+        //     'add_time' => ['添加时间',"formatTime"],
+        //     'last_update' => ['最近更新时间',"formatTime"],
+        //     "uri"        => ["当前uri", "formatUri"],
+        // ],
     ];
 
     private static $instance;
@@ -134,17 +134,15 @@ class StocksService extends InnerService
      */
     public function get()
     {
-        $limit = 10;
-        $list = InvStock::all(function ($query) use($limit){
-            $query->order('stock_id desc')
-                  ->limit($limit);
-        });
-        if($list) {
-            return $this->success($list);
-        }else{
-            return $this->bError(1000);
-        }
-
+        $start = empty($this->params['start']) ? 0 : intval($this->params['start']);
+        // FIXME: hard code
+        $limit = 20;
+        $stocks = $this->stockModel->getStocks($this->store->store_id, $limit, $start);
+        $this->success([
+            '_links' => ['next' => count($stocks) === $limit ? '/api/v1/home?limit=20&start='.($start + count($stocks)) : ''],
+            'store' => $this->store,
+            'stocks' => $stocks,
+        ]);
     }
 
 
