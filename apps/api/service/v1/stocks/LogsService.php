@@ -123,9 +123,10 @@ class LogsService extends InnerService
     {
         $start = empty($this->params['start']) ? 0 : intval($this->params['start']);
         $type = empty($this->params['type']) ? 0 : $this->params['type'];
+        $stockId = empty($this->params['stock_id']) ? 0 : $this->params['stock_id'];
         // FIXME: hard code
         $limit = 20;
-        $list = $this->stockLogModel->getLogs($this->store->store_id, $type, $start, $limit);
+        $list = $this->stockLogModel->getLogs($this->store->store_id, $type, $stockId, $start, $limit);
         if($list) {
             return $this->success([
                 '_links' => ['next' => count($list) === $limit ? '/api/v1/stocks/logs?limit='.$limit.'&start='.($start + count($list)) : ''],
