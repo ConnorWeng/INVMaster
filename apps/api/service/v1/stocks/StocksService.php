@@ -45,12 +45,6 @@ class StocksService extends InnerService
      * "status" => ['状态' , 1 , ["0" => '禁用' , 1 => '启用'] ]     // 固定数值约束，该变量只有 0 和 1 两个值
      */
     public $defaultParams = [
-        'post' => [
-            'product_code' => ['款号', 0, 1],
-            "color" => ['颜色', '', 1],
-            "size" => ['尺码', '', 1],
-            "stock_amount" => ['数量', 0, 1]
-        ],
     ];
 
     /**
@@ -149,33 +143,44 @@ class StocksService extends InnerService
     public function post()
     {
         // FIXME: use transaction
-        $stock = $this->stockModel->searchByProductCode($this->store->store_id, $this->params['product_code']);
-        if (!$stock) {
-            $productId = $this->getProductId();
-            $this->stockModel->data([
-                'store_id' => $this->store->store_id,
-                'product_id' => $productId,
-                'stock_amount' => $this->params['stock_amount']])->save();
-            $stockId = $this->stockModel->stock_id;
-        } else {
-            $stock->stock_amount = $stock->stock_amount + intval($this->params['stock_amount']);
-            $stock->save();
-            $stockId = $stock->stock_id;
+        $this->stockModel->startTrans();
+        $this->stockSkuModel->startTrans();
+        $this->stockLogModel->startTrans();
+
+        foreach ($this->params['stocks'] as $inStock) {
+            $stock = $this->stockModel->searchByProductCode($this->store->store_id, $inStock['product_code']);
+            if (!$stock) {
+                $productId = $this->getProductId();
+                $this->stockModel->data([
+                    'store_id' => $this->store->store_id,
+                    'product_id' => $productId,
+                    'stock_amount' => $inStock['stock_amount']])->save();
+                $stockId = $this->stockModel->stock_id;
+            } else {
+                $stock->stock_amount = $stock->stock_amount + intval($inStock['stock_amount']);
+                $stock->save();
+                $stockId = $stock->stock_id;
+            }
+            // TODO: increase amount if sku exists, otherwise insert a new sku. After that update stock amount
+            $stockSku = $this->stockSkuModel->getSku($stockId, $inStock['color'], $inStock['size']);
+            if ($stockSku) {
+                $stockSku->stock_amount = $stockSku->stock_amount + intval($inStock['stock_amount']);
+                $stockSku->save();
+            } else {
+                $stockSku = $this->stockSkuModel->data([
+                    'stock_id' => $stockId,
+                    'color' => $inStock['color'],
+                    'size' => $inStock['size'],
+                    'stock_amount' => $inStock['stock_amount']]);
+                $stockSku->save();
+            }
+            $this->stockLogModel->log($this->userData, $stockSku, 1, $inStock['stock_amount']);
         }
-        // TODO: increase amount if sku exists, otherwise insert a new sku. After that update stock amount
-        $stockSku = $this->stockSkuModel->getSku($stockId, $this->params['color'], $this->params['size']);
-        if ($stockSku) {
-            $stockSku->stock_amount = $stockSku->stock_amount + intval($this->params['stock_amount']);
-            $stockSku->save();
-        } else {
-            $stockSku = $this->stockSkuModel->data([
-                'stock_id' => $stockId,
-                'color' => $this->params['color'],
-                'size' => $this->params['size'],
-                'stock_amount' => $this->params['stock_amount']]);
-            $stockSku->save();
-        }
-        $this->stockLogModel->log($this->userData, $stockSku, 1, $this->params['stock_amount']);
+
+        $this->stockModel->commit();
+        $this->stockSkuModel->commit();
+        $this->stockLogModel->commit();
+
         return $this->success('ok');
     }
 
