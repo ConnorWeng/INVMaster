@@ -26,7 +26,8 @@ class InvStockLog extends Model {
     }
 
     public function log($user, $sku, $type, $amount) {
-        $this->data([
+        $log = new InvStockLog;
+        $log->data([
             'user_id' => $user->user_id,
             'nick_name' => $user->wx_nick_name,
             'stock_id' => $sku->stock_id,

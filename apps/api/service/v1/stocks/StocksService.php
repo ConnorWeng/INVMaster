@@ -51,10 +51,6 @@ class StocksService extends InnerService
             "size" => ['尺码', '', 1],
             "stock_amount" => ['数量', 0, 1]
         ],
-        'delete' => [
-            'sku_id' => ['sku id', 0, 1],
-            'stock_amount' => ['数量', 0, 1]
-        ],
     ];
 
     /**
@@ -196,22 +192,42 @@ class StocksService extends InnerService
     }
 
     public function delete() {
-        $sku = $this->stockSkuModel->get($this->params['sku_id']);
+        $this->stockSkuModel->startTrans();
+        $this->stockLogModel->startTrans();
+        $result = false;
+        if (is_array($this->params['stocks'])) {
+            foreach ($this->params['stocks'] as $stock) {
+                $result = $this->decreaseStockAmount($stock['sku_id'], $stock['stock_amount']);
+                if (!$result) {
+                    break;
+                }
+            }
+        }
+        if ($result) {
+            $this->stockSkuModel->commit();
+            $this->stockLogModel->commit();
+            return $this->success('ok');
+        } else {
+            $this->stockSkuModel->rollBack();
+            $this->stockLogModel->rollBack();
+            return $this->bError(4000);
+        }
+    }
+
+    private function decreaseStockAmount($skuId, $amount) {
+        $sku = $this->stockSkuModel->get($skuId);
         if ($sku) {
-            $stockAmount = intval($this->params['stock_amount']);
+            $stockAmount = intval($amount);
             if ($stockAmount > 0 && $stockAmount <= $sku->stock_amount) {
                 $sku->stock_amount = $sku->stock_amount - $stockAmount;
                 $sku->stock->stock_amount = $sku->stock->stock_amount - $stockAmount;
                 $sku->stock->save();
                 $sku->save();
-                $this->stockLogModel->log($this->userData, $sku, 2, $this->params['stock_amount']);
-                return $this->success('ok');
-            } else {
-                return $this->bError(4001);
+                $this->stockLogModel->log($this->userData, $sku, 2, $amount);
+                return true;
             }
-        } else {
-            return $this->bError(4000);
         }
+        return false;
     }
 
 
