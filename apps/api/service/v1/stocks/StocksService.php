@@ -167,12 +167,15 @@ class StocksService extends InnerService
                 $stockSku->stock_amount = $stockSku->stock_amount + intval($inStock['stock_amount']);
                 $stockSku->save();
             } else {
-                $stockSku = $this->stockSkuModel->data([
+                $newStockSku = new InvStockSku;
+                $newStockSku->startTrans();
+                $stockSku = $newStockSku->data([
                     'stock_id' => $stockId,
                     'color' => $inStock['color'],
                     'size' => $inStock['size'],
                     'stock_amount' => $inStock['stock_amount']]);
                 $stockSku->save();
+                $newStockSku->commit();
             }
             $this->stockLogModel->log($this->userData, $stockSku, 1, $inStock['stock_amount']);
         }
